@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trích Xuất Link Ảnh</title>
+<style>
+    @font-face{
+        font-family:"GFF-Latin-Bold";
+        src:
+            url("https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Bold.woff2") format("woff2"),
+            url("https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Bold.woff") format("woff");
+    }
+
+    *,*::before,*::after{
+        box-sizing:border-box;
+        font-family:"GFF-Latin-Bold","Segoe UI",Tahoma,sans-serif;
+        font-weight:normal;
+    }
+
+    :root{
+        --bg:#0a0e14;
+        --panel:#141b25;
+        --panel2:#1c2530;
+        --line:#2a3646;
+        --txt:#eef3f9;
+        --muted:#8fa2b8;
+        --acc:#ff8a1e;
+        --acc2:#ff4d00;
+        --ok:#2ecc71;
+    }
+
+    body{
+        margin:0;
+        padding:28px 16px 80px;
+        min-height:100vh;
+        color:var(--txt);
+        background:
+            radial-gradient(1000px 560px at 8% -12%, rgba(255,138,30,.18), transparent 62%),
+            radial-gradient(900px 520px at 100% 0%, rgba(255,77,0,.14), transparent 58%),
+            radial-gradient(700px 700px at 50% 120%, rgba(90,110,255,.08), transparent 60%),
+            var(--bg);
+    }
+
+    .wrap{ max-width:1020px; margin:0 auto; }
+
+    /* ---------- Header ---------- */
+    .head{ text-align:center; margin-bottom:26px; }
+
+    .head h1{
+        font-size:30px;
+        margin:0 0 8px;
+        letter-spacing:.8px;
+        background:linear-gradient(90deg,#ffb347,#ff8a1e 45%,#ff4d00);
+        -webkit-background-clip:text;
+        background-clip:text;
+        color:transparent;
+        filter:drop-shadow(0 4px 18px rgba(255,77,0,.28));
+    }
+
+    .head p{
+        margin:0;
+        color:var(--muted);
+        font-size:14px;
+    }
+
+    /* ---------- Panel ---------- */
+    .panel{
+        background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+        border:1px solid var(--line);
+        border-radius:20px;
+        padding:22px;
+        box-shadow:0 16px 50px rgba(0,0,0,.4);
+        backdrop-filter:blur(8px);
+    }
+
+    .drop{
+        position:relative;
+        border:2px dashed var(--line);
+        border-radius:14px;
+        background:rgba(255,255,255,.02);
+        padding:30px 20px;
+        text-align:center;
+        cursor:pointer;
+        transition:.24s;
+        user-select:none;
+    }
+
+    .drop:hover,
+    .drop.dragover{
+        border-color:var(--acc);
+        background:rgba(255,138,30,.08);
+    }
+
+    .drop.dragover{ transform:scale(1.01); }
+
+    .drop .icon{
+        font-size:36px;
+        line-height:1;
+        margin-bottom:10px;
+        filter:drop-shadow(0 6px 16px rgba(255,138,30,.45));
+    }
+
+    .drop .txt{ font-size:14.5px; color:var(--muted); }
+    .drop .txt b{ color:var(--acc); }
+
+    textarea{
+        width:100%;
+        min-height:110px;
+        margin-top:16px;
+        padding:14px 16px;
+        border-radius:12px;
+        border:1px solid var(--line);
+        background:var(--panel2);
+        color:var(--txt);
+        font-size:13.5px;
+        line-height:1.65;
+        resize:vertical;
+        outline:none;
+        transition:.2s;
+    }
+
+    textarea:focus{
+        border-color:rgba(255,138,30,.7);
+        box-shadow:0 0 0 3px rgba(255,138,30,.15);
+    }
+
+    textarea::placeholder{ color:#61748a; }
+
+    .toolbar{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-top:16px;
+    }
+
+    .chk{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        font-size:13.5px;
+        color:var(--muted);
+        cursor:pointer;
+        user-select:none;
+    }
+
+    .chk input{
+        width:16px;height:16px;
+        accent-color:var(--acc);
+        cursor:pointer;
+    }
+
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+    button{
+        border:1px solid var(--line);
+        background:var(--panel2);
+        color:var(--txt);
+        padding:10px 18px;
+        border-radius:11px;
+        font-size:13.5px;
+        cursor:pointer;
+        transition:.18s;
+        letter-spacing:.3px;
+        white-space:nowrap;
+    }
+
+    button:hover{
+        background:#2b3644;
+        border-color:#3d4c5e;
+        transform:translateY(-1px);
+    }
+
+    button:active{ transform:translateY(0); }
+
+    button.primary{
+        background:linear-gradient(135deg,var(--acc),var(--acc2));
+        border:none;
+        color:#fff;
+        box-shadow:0 8px 22px rgba(255,77,0,.32);
+    }
+
+    button.primary:hover{
+        background:linear-gradient(135deg,#ff9c3f,#ff5c14);
+        box-shadow:0 10px 26px rgba(255,77,0,.45);
+    }
+
+    /* ============================================================
+       KẾT QUẢ — THIẾT KẾ ĐẸP
+       ============================================================ */
+    .result{
+        margin-top:30px;
+        animation:fade .3s ease;
+    }
+
+    @keyframes fade{
+        from{ opacity:0; transform:translateY(12px); }
+        to{ opacity:1; transform:translateY(0); }
+    }
+
+    /* thanh thông tin trên cùng */
+    .result-bar{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:14px;
+        flex-wrap:wrap;
+        margin-bottom:18px;
+        padding:14px 18px;
+        background:linear-gradient(135deg, rgba(255,138,30,.10), rgba(255,77,0,.05));
+        border:1px solid rgba(255,138,30,.25);
+        border-radius:14px;
+        box-shadow:0 6px 24px rgba(0,0,0,.25);
+    }
+
+    .result-bar .count{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        font-size:15px;
+        color:var(--txt);
+    }
+
+    .result-bar .count .badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-width:34px;
+        height:34px;
+        padding:0 10px;
+        border-radius:9px;
+        background:linear-gradient(135deg,var(--acc),var(--acc2));
+        color:#fff;
+        font-size:14px;
+        box-shadow:0 4px 14px rgba(255,77,0,.4);
+    }
+
+    .result-bar .count .label{ color:var(--muted); font-size:14px; }
+
+    .result-bar .tools{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+    }
+
+    .result-bar button{
+        padding:9px 16px;
+        font-size:12.5px;
+        border-radius:10px;
+        background:rgba(255,255,255,.05);
+        border:1px solid var(--line);
+    }
+
+    .result-bar button:hover{
+        background:rgba(255,138,30,.15);
+        border-color:rgba(255,138,30,.5);
+        color:#ffc78a;
+    }
+
+    /* ---------- Grid card ---------- */
+    #list{
+        list-style:none;
+        margin:0;
+        padding:0;
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+        gap:16px;
+    }
+
+    .card{
+        position:relative;
+        background:linear-gradient(180deg, var(--panel), var(--panel2));
+        border:1px solid var(--line);
+        border-radius:16px;
+        overflow:hidden;
+        transition:transform .25s cubic-bezier(.2,.8,.2,1),
+                   border-color .25s,
+                   box-shadow .25s;
+        animation:cardIn .35s ease both;
+    }
+
+    .card:nth-child(1){ animation-delay:.02s; }
+    .card:nth-child(2){ animation-delay:.05s; }
+    .card:nth-child(3){ animation-delay:.08s; }
+    .card:nth-child(4){ animation-delay:.11s; }
+    .card:nth-child(5){ animation-delay:.14s; }
+    .card:nth-child(6){ animation-delay:.17s; }
+
+    @keyframes cardIn{
+        from{ opacity:0; transform:translateY(14px) scale(.98); }
+        to{ opacity:1; transform:translateY(0) scale(1); }
+    }
+
+    .card:hover{
+        transform:translateY(-4px);
+        border-color:rgba(255,138,30,.55);
+        box-shadow:
+            0 16px 40px rgba(0,0,0,.45),
+            0 0 0 1px rgba(255,138,30,.2),
+            0 0 30px rgba(255,77,0,.12);
+    }
+
+    /* ảnh minh họa lớn phía trên card */
+    .thumb{
+        position:relative;
+        width:100%;
+        height:170px;
+        background:
+            linear-gradient(135deg, #1a2330, #141b25);
+        overflow:hidden;
+        border-bottom:1px solid var(--line);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+
+    /* checker pattern cho ảnh trong suốt */
+    .thumb::before{
+        content:'';
+        position:absolute;
+        inset:0;
+        background-image:
+            linear-gradient(45deg, rgba(255,255,255,.025) 25%, transparent 25%),
+            linear-gradient(-45deg, rgba(255,255,255,.025) 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, rgba(255,255,255,.025) 75%),
+            linear-gradient(-45deg, transparent 75%, rgba(255,255,255,.025) 75%);
+        background-size:16px 16px;
+        background-position:0 0, 0 8px, 8px -8px, -8px 0;
+        opacity:.8;
+    }
+
+    .thumb img{
+        position:relative;
+        max-width:100%;
+        max-height:100%;
+        object-fit:contain;
+        display:block;
+        transition:transform .35s ease;
+        z-index:1;
+    }
+
+    .card:hover .thumb img{ transform:scale(1.05); }
+
+    .thumb .broken{
+        position:relative;
+        z-index:1;
+        font-size:12px;
+        color:var(--muted);
+        text-align:center;
+        padding:12px;
+    }
+
+    .thumb .broken span{
+        display:block;
+        font-size:28px;
+        margin-bottom:6px;
+        filter:grayscale(.6);
+    }
+
+    /* badge số thứ tự góc trên trái */
+    .badge-idx{
+        position:absolute;
+        top:10px;
+        left:10px;
+        z-index:2;
+        min-width:30px;
+        height:30px;
+        padding:0 9px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        font-size:12px;
+        color:#fff;
+        background:linear-gradient(135deg, var(--acc), var(--acc2));
+        border-radius:9px;
+        box-shadow:0 4px 14px rgba(255,77,0,.5);
+        letter-spacing:.5px;
+    }
+
+    /* badge đuôi file góc trên phải */
+    .badge-ext{
+        position:absolute;
+        top:10px;
+        right:10px;
+        z-index:2;
+        padding:4px 9px;
+        font-size:11px;
+        color:#ffd6a8;
+        background:rgba(20,27,37,.85);
+        border:1px solid rgba(255,138,30,.35);
+        border-radius:7px;
+        text-transform:uppercase;
+        letter-spacing:.5px;
+        backdrop-filter:blur(6px);
+    }
+
+    /* phần thân card: link + nút copy */
+    .card-body{
+        padding:12px 14px 14px;
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .url-line{
+        font-size:12.5px;
+        line-height:1.5;
+        color:#9fd0ff;
+        text-decoration:none;
+        word-break:break-all;
+        display:-webkit-box;
+        -webkit-line-clamp:2;
+        -webkit-box-orient:vertical;
+        overflow:hidden;
+        transition:color .15s;
+    }
+
+    .url-line:hover{ color:#cfe8ff; text-decoration:underline; }
+
+    .card-actions{
+        display:flex;
+        gap:8px;
+    }
+
+    .card-actions button,
+    .card-actions a.btn-open{
+        flex:1;
+        padding:8px 10px;
+        font-size:12px;
+        border-radius:9px;
+        text-align:center;
+        text-decoration:none;
+        transition:.18s;
+        cursor:pointer;
+        border:1px solid var(--line);
+        background:rgba(255,255,255,.04);
+        color:var(--txt);
+    }
+
+    .card-actions button:hover,
+    .card-actions a.btn-open:hover{
+        background:rgba(255,138,30,.16);
+        border-color:rgba(255,138,30,.5);
+        color:#ffc78a;
+        transform:translateY(-1px);
+    }
+
+    .card-actions .btn-copy.done{
+        background:linear-gradient(135deg,#2ecc71,#26b862);
+        border-color:#2ecc71;
+        color:#0a0e14;
+    }
+
+    /* empty */
+    .empty{
+        grid-column:1 / -1;
+        padding:40px 20px;
+        text-align:center;
+        color:var(--muted);
+        font-size:14px;
+        background:var(--panel);
+        border:1px dashed var(--line);
+        border-radius:16px;
+    }
+
+    .empty .ico{
+        font-size:38px;
+        display:block;
+        margin-bottom:10px;
+        opacity:.7;
+    }
+
+    .hidden{ display:none !important; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar{ width:9px; height:9px; }
+    ::-webkit-scrollbar-thumb{ background:#2f3a48; border-radius:8px; }
+    ::-webkit-scrollbar-thumb:hover{ background:#3d4c5e; }
+    ::-webkit-scrollbar-track{ background:transparent; }
+
+    @media (max-width:560px){
+        .head h1{ font-size:23px; }
+        .panel{ padding:16px; }
+        #list{ grid-template-columns:1fr; }
+        .thumb{ height:190px; }
+        .result-bar{ flex-direction:column; align-items:stretch; }
+        .result-bar .tools{ justify-content:stretch; }
+        .result-bar button{ flex:1; }
+    }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+    <div class="head">
+        <h1>TRÍCH XUẤT LINK ẢNH</h1>
+        <p>Kéo thả file hoặc dán nội dung — tự động tách các link ảnh (.png, .jpg, .gif, .webp...)</p>
+    </div>
+
+    <div class="panel">
+        <div class="drop" id="drop">
+            <div class="icon">🖼️</div>
+            <div class="txt">Kéo thả file vào đây hoặc <b>bấm để chọn file</b></div>
+            <input type="file" id="fileInput" multiple hidden>
+        </div>
+
+        <textarea id="input" placeholder="Dán nội dung HTML / JSON / CSS / TXT ... vào đây..."></textarea>
+
+        <div class="toolbar">
+            <label class="chk">
+                <input type="checkbox" id="onlyUnique" checked>
+                Loại bỏ link trùng nhau
+            </label>
+            <div class="actions">
+                <button class="primary" id="btnExtract">⚡ Tách link ảnh</button>
+                <button id="btnClear">🗑 Xoá</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="result hidden" id="result">
+        <div class="result-bar">
+            <div class="count">
+                <span class="badge" id="count">0</span>
+                <span class="label">link ảnh được tìm thấy</span>
+            </div>
+            <div class="tools">
+                <button id="btnCopyAll">📋 Copy tất cả</button>
+                <button id="btnDownload">⬇ Tải .txt</button>
+            </div>
+        </div>
+        <ul id="list"></ul>
+    </div>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    var drop        = document.getElementById('drop');
+    var fileInput   = document.getElementById('fileInput');
+    var input       = document.getElementById('input');
+    var onlyUnique  = document.getElementById('onlyUnique');
+    var btnExtract  = document.getElementById('btnExtract');
+    var btnClear    = document.getElementById('btnClear');
+    var resultBox   = document.getElementById('result');
+    var list        = document.getElementById('list');
+    var countEl     = document.getElementById('count');
+    var btnCopyAll  = document.getElementById('btnCopyAll');
+    var btnDownload = document.getElementById('btnDownload');
+
+    var currentLinks = [];
+
+    var IMG_RE = /[^\s"'`<>\\()\[\]{},;]+?\.(?:png|jpe?g|gif|webp|bmp|svg|avif|ico|tiff?|heic|heif|jfif|apng)(?:\?[^\s"'`<>\\()\[\]{},;]*)?(?![\w])/gi;
+
+    function extractLinks(text) {
+        if (!text) return [];
+        var clean = text
+            .replace(/\\\//g, '/')
+            .replace(/&amp;/gi, '&')
+            .replace(/&#x2F;/gi, '/')
+            .replace(/&#47;/g, '/')
+            .replace(/&quot;/gi, '"');
+
+        var found = clean.match(IMG_RE) || [];
+        return found.map(function (s) {
+            return s.replace(/[.,;:!?)\]}>]+$/, '');
+        }).filter(function (s) { return s.indexOf('.') > -1; });
+    }
+
+    function getExt(url) {
+        var m = url.match(/\.([a-z0-9]+)(?:\?|#|$)/i);
+        return m ? m[1].toLowerCase() : 'img';
+    }
+
+    function render(links) {
+        currentLinks = links;
+        list.innerHTML = '';
+        resultBox.classList.remove('hidden');
+        countEl.textContent = links.length;
+
+        if (!links.length) {
+            var empty = document.createElement('div');
+            empty.className = 'empty';
+            empty.innerHTML = '<span class="ico">🔍</span>Không tìm thấy link ảnh nào trong nội dung.';
+            list.appendChild(empty);
+            return;
+        }
+
+        var frag = document.createDocumentFragment();
+
+        links.forEach(function (url, i) {
+            var li = document.createElement('li');
+            li.className = 'card';
+
+            /* --- vùng ảnh --- */
+            var thumb = document.createElement('div');
+            thumb.className = 'thumb';
+
+            var idx = document.createElement('span');
+            idx.className = 'badge-idx';
+            idx.textContent = '#' + (i + 1);
+
+            var ext = document.createElement('span');
+            ext.className = 'badge-ext';
+            ext.textContent = getExt(url);
+
+            var img = document.createElement('img');
+            img.loading = 'lazy';
+            img.alt = 'Ảnh #' + (i + 1);
+            img.src = url;
+            img.onerror = function () {
+                var broken = document.createElement('div');
+                broken.className = 'broken';
+                broken.innerHTML = '<span>🖼️</span>Không tải được ảnh';
+                if (img.parentNode) img.parentNode.replaceChild(broken, img);
+            };
+
+            thumb.appendChild(idx);
+            thumb.appendChild(ext);
+            thumb.appendChild(img);
+
+            /* --- thân card --- */
+            var body = document.createElement('div');
+            body.className = 'card-body';
+
+            var a = document.createElement('a');
+            a.className = 'url-line';
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = url;
+            a.title = url;
+
+            var acts = document.createElement('div');
+            acts.className = 'card-actions';
+
+            var btnCopy = document.createElement('button');
+            btnCopy.className = 'btn-copy';
+            btnCopy.type = 'button';
+            btnCopy.textContent = '📋 Copy';
+            btnCopy.addEventListener('click', function () {
+                copyText(url, function () {
+                    btnCopy.textContent = '✓ Đã copy';
+                    btnCopy.classList.add('done');
+                    setTimeout(function () {
+                        btnCopy.textContent = '📋 Copy';
+                        btnCopy.classList.remove('done');
+                    }, 1300);
+                });
+            });
+
+            var btnOpen = document.createElement('a');
+            btnOpen.className = 'btn-open';
+            btnOpen.href = url;
+            btnOpen.target = '_blank';
+            btnOpen.rel = 'noopener noreferrer';
+            btnOpen.textContent = '🔗 Mở';
+
+            acts.appendChild(btnCopy);
+            acts.appendChild(btnOpen);
+
+            body.appendChild(a);
+            body.appendChild(acts);
+
+            li.appendChild(thumb);
+            li.appendChild(body);
+            frag.appendChild(li);
+        });
+
+        list.appendChild(frag);
+    }
+
+    function copyText(text, done) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done).catch(function () {
+                fallbackCopy(text); done();
+            });
+        } else {
+            fallbackCopy(text); done();
+        }
+    }
+
+    function fallbackCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.top = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+    }
+
+    function runExtract() {
+        var links = extractLinks(input.value);
+        if (onlyUnique.checked) {
+            var seen = Object.create(null);
+            links = links.filter(function (u) {
+                var k = u.toLowerCase();
+                if (seen[k]) return false;
+                seen[k] = true;
+                return true;
+            });
+        }
+        render(links);
+    }
+
+    function readFiles(fileList) {
+        var files = Array.prototype.slice.call(fileList || []);
+        if (!files.length) return;
+
+        var results = new Array(files.length);
+        var done = 0;
+
+        files.forEach(function (file, index) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                results[index] = e.target.result || '';
+                done++;
+                if (done === files.length) finish();
+            };
+            reader.onerror = function () {
+                done++;
+                if (done === files.length) finish();
+            };
+            reader.readAsText(file, 'UTF-8');
+        });
+
+        function finish() {
+            var joined = results.filter(Boolean).join('\n\n');
+            input.value = input.value.trim()
+                ? input.value + '\n\n' + joined
+                : joined;
+            runExtract();
+        }
+    }
+
+    drop.addEventListener('click', function () { fileInput.click(); });
+
+    fileInput.addEventListener('change', function (e) {
+        readFiles(e.target.files);
+        fileInput.value = '';
+    });
+
+    ['dragenter','dragover'].forEach(function (ev) {
+        drop.addEventListener(ev, function (e) {
+            e.preventDefault(); e.stopPropagation();
+            drop.classList.add('dragover');
+        });
+    });
+
+    ['dragleave','drop'].forEach(function (ev) {
+        drop.addEventListener(ev, function (e) {
+            e.preventDefault(); e.stopPropagation();
+            if (ev === 'dragleave' && drop.contains(e.relatedTarget)) return;
+            drop.classList.remove('dragover');
+        });
+    });
+
+    drop.addEventListener('drop', function (e) {
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+            readFiles(e.dataTransfer.files);
+        }
+    });
+
+    window.addEventListener('dragover', function (e) { e.preventDefault(); });
+    window.addEventListener('drop', function (e) { e.preventDefault(); });
+
+    btnExtract.addEventListener('click', runExtract);
+
+    btnClear.addEventListener('click', function () {
+        input.value = '';
+        list.innerHTML = '';
+        currentLinks = [];
+        resultBox.classList.add('hidden');
+        input.focus();
+    });
+
+    btnCopyAll.addEventListener('click', function () {
+        if (!currentLinks.length) return;
+        copyText(currentLinks.join('\n'), function () {
+            btnCopyAll.textContent = '✓ Đã copy ' + currentLinks.length + ' link';
+            setTimeout(function () {
+                btnCopyAll.textContent = '📋 Copy tất cả';
+            }, 1500);
+        });
+    });
+
+    btnDownload.addEventListener('click', function () {
+        if (!currentLinks.length) return;
+        var blob = new Blob([currentLinks.join('\n')], { type: 'text/plain;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'image-links.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    });
+
+})();
+</script>
+</body>
+</html>
