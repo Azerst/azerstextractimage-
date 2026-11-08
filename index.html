@@ -3,569 +3,406 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trích Xuất Link Ảnh</title>
+<title>Tìm Kiếm Item — Free Fire</title>
 <style>
-    @font-face{
-        font-family:"GFF-Latin-Bold";
-        src:
-            url("https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Bold.woff2") format("woff2"),
-            url("https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Bold.woff") format("woff");
-    }
+/* ===== FONT GFF ===== */
+@font-face{
+    font-family:"GFF-Latin-Bold";
+    src:
+        url("https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Bold.woff2") format("woff2"),
+        url("https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Bold.woff") format("woff");
+    font-display: swap;
+}
 
-    *,*::before,*::after{
-        box-sizing:border-box;
-        font-family:"GFF-Latin-Bold","Segoe UI",Tahoma,sans-serif;
-        font-weight:normal;
-    }
+*{ box-sizing: border-box; }
 
-    :root{
-        --bg:#0a0e14;
-        --panel:#141b25;
-        --panel2:#1c2530;
-        --line:#2a3646;
-        --txt:#eef3f9;
-        --muted:#8fa2b8;
-        --acc:#ff8a1e;
-        --acc2:#ff4d00;
-        --ok:#2ecc71;
-    }
+html, body{ min-height: 100%; }
 
-    body{
-        margin:0;
-        padding:28px 16px 80px;
-        min-height:100vh;
-        color:var(--txt);
-        background:
-            radial-gradient(1000px 560px at 8% -12%, rgba(255,138,30,.18), transparent 62%),
-            radial-gradient(900px 520px at 100% 0%, rgba(255,77,0,.14), transparent 58%),
-            radial-gradient(700px 700px at 50% 120%, rgba(90,110,255,.08), transparent 60%),
-            var(--bg);
-    }
+body{
+    margin: 0;
+    font-family: "GFF-Latin-Bold", "Segoe UI", Roboto, Arial, sans-serif;
+    color: #e9eefb;
+    background: #05070d;
+    -webkit-font-smoothing: antialiased;
+}
 
-    .wrap{ max-width:1020px; margin:0 auto; }
+/* ===== NỀN ===== */
+body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-image: url("https://dl.aw.freefiremobile.com/common/OB55/CSH/gacha/TokenWheel3_20261108_FistCosmicComet_LobbyBG_VN_vn.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: brightness(.42) saturate(1.15);
+    transform: scale(1.02);
+}
 
-    .head{ text-align:center; margin-bottom:26px; }
+body::after{
+    content:"";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(120,180,255,.20), transparent 60%),
+        linear-gradient(180deg, rgba(5,7,13,.55) 0%, rgba(5,7,13,.88) 55%, rgba(5,7,13,.97) 100%);
+}
 
-    .head h1{
-        font-size:30px;
-        margin:0 0 8px;
-        letter-spacing:.8px;
-        background:linear-gradient(90deg,#ffb347,#ff8a1e 45%,#ff4d00);
-        -webkit-background-clip:text;
-        background-clip:text;
-        color:transparent;
-        filter:drop-shadow(0 4px 18px rgba(255,77,0,.28));
-    }
+/* ===== HEADER ===== */
+header{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 16px 16px 14px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: linear-gradient(180deg, rgba(9,13,24,.92), rgba(9,13,24,.62));
+    border-bottom: 1px solid rgba(140,180,255,.16);
+}
 
-    .head p{
-        margin:0;
-        color:var(--muted);
-        font-size:14px;
-    }
+.wrap{ max-width: 940px; margin: 0 auto; }
 
-    .panel{
-        background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-        border:1px solid var(--line);
-        border-radius:20px;
-        padding:22px;
-        box-shadow:0 16px 50px rgba(0,0,0,.4);
-        backdrop-filter:blur(8px);
-    }
+.title-row{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
 
-    .drop{
-        position:relative;
-        border:2px dashed var(--line);
-        border-radius:14px;
-        background:rgba(255,255,255,.02);
-        padding:30px 20px;
-        text-align:center;
-        cursor:pointer;
-        transition:.24s;
-        user-select:none;
-    }
+h1{
+    font-size: 19px;
+    margin: 0;
+    letter-spacing: .4px;
+    background: linear-gradient(90deg,#ffe08a,#8fd3ff 55%,#c9a6ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 22px rgba(120,180,255,.25);
+}
 
-    .drop:hover,
-    .drop.dragover{
-        border-color:var(--acc);
-        background:rgba(255,138,30,.08);
-    }
+.count-badge{
+    margin-left: auto;
+    font-size: 12px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    color: #bfe0ff;
+    background: rgba(90,150,255,.13);
+    border: 1px solid rgba(120,180,255,.28);
+    white-space: nowrap;
+}
 
-    .drop.dragover{ transform:scale(1.01); }
+/* ===== SEARCH ===== */
+.search-box{
+    position: relative;
+    display: flex;
+    align-items: center;
+}
 
-    .drop .icon{
-        font-size:36px;
-        line-height:1;
-        margin-bottom:10px;
-        filter:drop-shadow(0 6px 16px rgba(255,138,30,.45));
-    }
+.search-box svg{
+    position: absolute;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    opacity: .65;
+    pointer-events: none;
+    fill: #9fc4ff;
+}
 
-    .drop .txt{ font-size:14.5px; color:var(--muted); }
-    .drop .txt b{ color:var(--acc); }
+#searchInput{
+    width: 100%;
+    padding: 13px 92px 13px 42px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #eaf2ff;
+    background: rgba(16,24,42,.85);
+    border: 1px solid rgba(120,180,255,.28);
+    border-radius: 14px;
+    outline: none;
+    transition: border-color .18s, box-shadow .18s, background .18s;
+}
 
-    /* --- file status indicator --- */
-    .file-status{
-        display:flex;
-        align-items:center;
-        gap:10px;
-        margin-top:12px;
-        padding:10px 14px;
-        border-radius:11px;
-        background:rgba(46,204,113,.08);
-        border:1px solid rgba(46,204,113,.3);
-        font-size:13px;
-        color:#a5e7c1;
-        animation:fade .25s ease;
-    }
+#searchInput::placeholder{ color: #6f86ac; }
 
-    .file-status .fs-text{
-        flex:1;
-        min-width:0;
-        overflow:hidden;
-        text-overflow:ellipsis;
-        white-space:nowrap;
-    }
+#searchInput:focus{
+    border-color: rgba(140,200,255,.75);
+    background: rgba(20,30,52,.95);
+    box-shadow: 0 0 0 4px rgba(80,150,255,.15), 0 0 26px rgba(80,150,255,.18);
+}
 
-    .file-status .fs-clear{
-        padding:4px 10px;
-        font-size:12px;
-        border-radius:7px;
-        background:rgba(255,255,255,.06);
-        border:1px solid rgba(255,255,255,.12);
-        color:#eef3f9;
-        cursor:pointer;
-        transition:.15s;
-    }
+#clearBtn{
+    position: absolute;
+    right: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    padding: 8px 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #0d1220;
+    background: linear-gradient(180deg,#ffe9a8,#f5c451);
+    border: none;
+    opacity: 0;
+    transform: scale(.9);
+    pointer-events: none;
+    transition: opacity .18s, transform .18s;
+    white-space: nowrap;
+}
+#clearBtn.show{ opacity: 1; transform: scale(1); pointer-events: auto; }
+#clearBtn:active{ transform: scale(.95); }
 
-    .file-status .fs-clear:hover{
-        background:rgba(255,80,80,.25);
-        border-color:rgba(255,80,80,.5);
-    }
+/* ===== LIST ===== */
+main{ padding: 18px 16px 90px; }
 
-    textarea{
-        width:100%;
-        min-height:110px;
-        margin-top:16px;
-        padding:14px 16px;
-        border-radius:12px;
-        border:1px solid var(--line);
-        background:var(--panel2);
-        color:var(--txt);
-        font-size:13.5px;
-        line-height:1.65;
-        resize:vertical;
-        outline:none;
-        transition:.2s;
-    }
+#list{ display: flex; flex-direction: column; gap: 9px; }
 
-    textarea:focus{
-        border-color:rgba(255,138,30,.7);
-        box-shadow:0 0 0 3px rgba(255,138,30,.15);
-    }
+.item{
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 13px;
+    background: rgba(255,255,255,.045);
+    border: 1px solid rgba(255,255,255,.075);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: background .15s, border-color .15s, transform .15s;
+    animation: fadeIn .22s ease both;
+}
 
-    textarea::placeholder{ color:#61748a; }
+.item:hover{
+    background: rgba(120,180,255,.10);
+    border-color: rgba(140,200,255,.34);
+    transform: translateX(2px);
+}
 
-    .toolbar{
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        gap:12px;
-        flex-wrap:wrap;
-        margin-top:16px;
-    }
+@keyframes fadeIn{
+    from{ opacity: 0; transform: translateY(6px); }
+    to{ opacity: 1; transform: translateY(0); }
+}
 
-    .chk{
-        display:inline-flex;
-        align-items:center;
-        gap:8px;
-        font-size:13.5px;
-        color:var(--muted);
-        cursor:pointer;
-        user-select:none;
-    }
+.idx{
+    flex: 0 0 auto;
+    min-width: 62px;
+    text-align: center;
+    font-size: 12px;
+    padding: 5px 8px;
+    border-radius: 9px;
+    color: #10151f;
+    background: linear-gradient(180deg,#ffe9a8,#e9b73f);
+    box-shadow: 0 2px 10px rgba(233,183,63,.22);
+    letter-spacing: .3px;
+}
 
-    .chk input{
-        width:16px;height:16px;
-        accent-color:var(--acc);
-        cursor:pointer;
-    }
+.text{
+    flex: 1 1 auto;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #dfe9fb;
+    word-break: break-word;
+    white-space: pre-wrap;
+    min-width: 0;
+}
 
-    .actions{ display:flex; gap:10px; flex-wrap:wrap; }
+mark{
+    color: #10151f;
+    background: linear-gradient(180deg,#a9e7ff,#5fc8ff);
+    border-radius: 4px;
+    padding: 0 2px;
+}
 
-    button{
-        border:1px solid var(--line);
-        background:var(--panel2);
-        color:var(--txt);
-        padding:10px 18px;
-        border-radius:11px;
-        font-size:13.5px;
-        cursor:pointer;
-        transition:.18s;
-        letter-spacing:.3px;
-        white-space:nowrap;
-    }
+/* ===== EMPTY / LOADER ===== */
+.empty{
+    text-align: center;
+    padding: 60px 20px;
+    color: #8ea3c6;
+    font-size: 14px;
+    line-height: 1.7;
+}
 
-    button:hover{
-        background:#2b3644;
-        border-color:#3d4c5e;
-        transform:translateY(-1px);
-    }
+#sentinel{ height: 1px; }
 
-    button:active{ transform:translateY(0); }
+#loading{
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    color: #7f95b8;
+    letter-spacing: .5px;
+}
 
-    button.primary{
-        background:linear-gradient(135deg,var(--acc),var(--acc2));
-        border:none;
-        color:#fff;
-        box-shadow:0 8px 22px rgba(255,77,0,.32);
-    }
+/* ===== OVERLAY NẠP DỮ LIỆU ===== */
+#loader{
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(3,6,12,.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+#loader.show{ display: flex; }
 
-    button.primary:hover{
-        background:linear-gradient(135deg,#ff9c3f,#ff5c14);
-        box-shadow:0 10px 26px rgba(255,77,0,.45);
-    }
+.loader-card{
+    width: 100%;
+    max-width: 520px;
+    padding: 26px 24px;
+    border-radius: 20px;
+    background: rgba(14,21,38,.96);
+    border: 1px solid rgba(120,180,255,.28);
+    box-shadow: 0 24px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03) inset;
+    text-align: center;
+}
 
-    /* ============================================================
-       KẾT QUẢ
-       ============================================================ */
-    .result{
-        margin-top:30px;
-        animation:fade .3s ease;
-    }
+.loader-card h2{
+    margin: 0 0 10px;
+    font-size: 17px;
+    color: #ffe08a;
+}
 
-    @keyframes fade{
-        from{ opacity:0; transform:translateY(12px); }
-        to{ opacity:1; transform:translateY(0); }
-    }
+.loader-card p{
+    margin: 0 0 16px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #9fb2d4;
+}
+.loader-card b{ color: #cfe2ff; }
 
-    .result-bar{
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        gap:14px;
-        flex-wrap:wrap;
-        margin-bottom:18px;
-        padding:14px 18px;
-        background:linear-gradient(135deg, rgba(255,138,30,.10), rgba(255,77,0,.05));
-        border:1px solid rgba(255,138,30,.25);
-        border-radius:14px;
-        box-shadow:0 6px 24px rgba(0,0,0,.25);
-    }
+.btn-file{
+    display: inline-block;
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #0d1220;
+    background: linear-gradient(180deg,#ffe9a8,#f0bd48);
+    box-shadow: 0 8px 24px rgba(240,189,72,.28);
+    transition: transform .15s, box-shadow .15s;
+    user-select: none;
+}
+.btn-file:hover{ transform: translateY(-1px); box-shadow: 0 12px 28px rgba(240,189,72,.38); }
+.btn-file:active{ transform: scale(.97); }
 
-    .result-bar .count{
-        display:flex;
-        align-items:center;
-        gap:10px;
-        font-size:15px;
-        color:var(--txt);
-    }
+.hint{
+    margin: 14px 0 0 !important;
+    font-size: 12px !important;
+    color: #6f86ac !important;
+}
 
-    .result-bar .count .badge{
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        min-width:34px;
-        height:34px;
-        padding:0 10px;
-        border-radius:9px;
-        background:linear-gradient(135deg,var(--acc),var(--acc2));
-        color:#fff;
-        font-size:14px;
-        box-shadow:0 4px 14px rgba(255,77,0,.4);
-    }
+.loader-card details{
+    margin-top: 18px;
+    text-align: left;
+    border-top: 1px solid rgba(120,180,255,.16);
+    padding-top: 14px;
+}
 
-    .result-bar .count .label{ color:var(--muted); font-size:14px; }
+.loader-card summary{
+    cursor: pointer;
+    font-size: 13px;
+    color: #9fc4ff;
+    outline: none;
+    user-select: none;
+}
 
-    .result-bar .tools{
-        display:flex;
-        gap:8px;
-        flex-wrap:wrap;
-    }
+#pasteArea{
+    width: 100%;
+    height: 110px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 12px;
+    color: #dbe7fb;
+    background: rgba(9,14,26,.95);
+    border: 1px solid rgba(120,180,255,.25);
+    border-radius: 10px;
+    resize: vertical;
+    outline: none;
+}
+#pasteArea:focus{ border-color: rgba(140,200,255,.7); }
 
-    .result-bar button{
-        padding:9px 16px;
-        font-size:12.5px;
-        border-radius:10px;
-        background:rgba(255,255,255,.05);
-        border:1px solid var(--line);
-    }
+#pasteBtn{
+    margin-top: 10px;
+    padding: 10px 18px;
+    font-family: inherit;
+    font-size: 13px;
+    border-radius: 10px;
+    border: 1px solid rgba(120,180,255,.35);
+    background: rgba(90,150,255,.18);
+    color: #cfe2ff;
+    cursor: pointer;
+}
+#pasteBtn:hover{ background: rgba(90,150,255,.3); }
 
-    .result-bar button:hover{
-        background:rgba(255,138,30,.15);
-        border-color:rgba(255,138,30,.5);
-        color:#ffc78a;
-    }
+.drop-active .loader-card{
+    border-color: rgba(255,224,138,.9);
+    box-shadow: 0 0 0 3px rgba(255,224,138,.25), 0 24px 70px rgba(0,0,0,.6);
+}
 
-    #list{
-        list-style:none;
-        margin:0;
-        padding:0;
-        display:grid;
-        grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
-        gap:16px;
-    }
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{ width: 10px; }
+::-webkit-scrollbar-track{ background: rgba(255,255,255,.03); }
+::-webkit-scrollbar-thumb{
+    background: rgba(120,180,255,.32);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover{ background: rgba(120,180,255,.55); background-clip: content-box; }
 
-    .card{
-        position:relative;
-        background:linear-gradient(180deg, var(--panel), var(--panel2));
-        border:1px solid var(--line);
-        border-radius:16px;
-        overflow:hidden;
-        transition:transform .25s cubic-bezier(.2,.8,.2,1),
-                   border-color .25s,
-                   box-shadow .25s;
-        animation:cardIn .35s ease both;
-    }
-
-    .card:nth-child(1){ animation-delay:.02s; }
-    .card:nth-child(2){ animation-delay:.05s; }
-    .card:nth-child(3){ animation-delay:.08s; }
-    .card:nth-child(4){ animation-delay:.11s; }
-    .card:nth-child(5){ animation-delay:.14s; }
-    .card:nth-child(6){ animation-delay:.17s; }
-
-    @keyframes cardIn{
-        from{ opacity:0; transform:translateY(14px) scale(.98); }
-        to{ opacity:1; transform:translateY(0) scale(1); }
-    }
-
-    .card:hover{
-        transform:translateY(-4px);
-        border-color:rgba(255,138,30,.55);
-        box-shadow:
-            0 16px 40px rgba(0,0,0,.45),
-            0 0 0 1px rgba(255,138,30,.2),
-            0 0 30px rgba(255,77,0,.12);
-    }
-
-    .thumb{
-        position:relative;
-        width:100%;
-        height:170px;
-        background:linear-gradient(135deg, #1a2330, #141b25);
-        overflow:hidden;
-        border-bottom:1px solid var(--line);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-    }
-
-    .thumb::before{
-        content:'';
-        position:absolute;
-        inset:0;
-        background-image:
-            linear-gradient(45deg, rgba(255,255,255,.025) 25%, transparent 25%),
-            linear-gradient(-45deg, rgba(255,255,255,.025) 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, rgba(255,255,255,.025) 75%),
-            linear-gradient(-45deg, transparent 75%, rgba(255,255,255,.025) 75%);
-        background-size:16px 16px;
-        background-position:0 0, 0 8px, 8px -8px, -8px 0;
-        opacity:.8;
-    }
-
-    .thumb img{
-        position:relative;
-        max-width:100%;
-        max-height:100%;
-        object-fit:contain;
-        display:block;
-        transition:transform .35s ease;
-        z-index:1;
-    }
-
-    .card:hover .thumb img{ transform:scale(1.05); }
-
-    .thumb .broken{
-        position:relative;
-        z-index:1;
-        font-size:12px;
-        color:var(--muted);
-        text-align:center;
-        padding:12px;
-    }
-
-    .thumb .broken span{
-        display:block;
-        font-size:28px;
-        margin-bottom:6px;
-        filter:grayscale(.6);
-    }
-
-    .badge-idx{
-        position:absolute;
-        top:10px;
-        left:10px;
-        z-index:2;
-        min-width:30px;
-        height:30px;
-        padding:0 9px;
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        font-size:12px;
-        color:#fff;
-        background:linear-gradient(135deg, var(--acc), var(--acc2));
-        border-radius:9px;
-        box-shadow:0 4px 14px rgba(255,77,0,.5);
-        letter-spacing:.5px;
-    }
-
-    .badge-ext{
-        position:absolute;
-        top:10px;
-        right:10px;
-        z-index:2;
-        padding:4px 9px;
-        font-size:11px;
-        color:#ffd6a8;
-        background:rgba(20,27,37,.85);
-        border:1px solid rgba(255,138,30,.35);
-        border-radius:7px;
-        text-transform:uppercase;
-        letter-spacing:.5px;
-        backdrop-filter:blur(6px);
-    }
-
-    .card-body{
-        padding:12px 14px 14px;
-        display:flex;
-        flex-direction:column;
-        gap:10px;
-    }
-
-    .url-line{
-        font-size:12.5px;
-        line-height:1.5;
-        color:#9fd0ff;
-        text-decoration:none;
-        word-break:break-all;
-        display:-webkit-box;
-        -webkit-line-clamp:2;
-        -webkit-box-orient:vertical;
-        overflow:hidden;
-        transition:color .15s;
-    }
-
-    .url-line:hover{ color:#cfe8ff; text-decoration:underline; }
-
-    .card-actions{
-        display:flex;
-        gap:8px;
-    }
-
-    .card-actions button,
-    .card-actions a.btn-open{
-        flex:1;
-        padding:8px 10px;
-        font-size:12px;
-        border-radius:9px;
-        text-align:center;
-        text-decoration:none;
-        transition:.18s;
-        cursor:pointer;
-        border:1px solid var(--line);
-        background:rgba(255,255,255,.04);
-        color:var(--txt);
-    }
-
-    .card-actions button:hover,
-    .card-actions a.btn-open:hover{
-        background:rgba(255,138,30,.16);
-        border-color:rgba(255,138,30,.5);
-        color:#ffc78a;
-        transform:translateY(-1px);
-    }
-
-    .card-actions .btn-copy.done{
-        background:linear-gradient(135deg,#2ecc71,#26b862);
-        border-color:#2ecc71;
-        color:#0a0e14;
-    }
-
-    .empty{
-        grid-column:1 / -1;
-        padding:40px 20px;
-        text-align:center;
-        color:var(--muted);
-        font-size:14px;
-        background:var(--panel);
-        border:1px dashed var(--line);
-        border-radius:16px;
-    }
-
-    .empty .ico{
-        font-size:38px;
-        display:block;
-        margin-bottom:10px;
-        opacity:.7;
-    }
-
-    .hidden{ display:none !important; }
-
-    ::-webkit-scrollbar{ width:9px; height:9px; }
-    ::-webkit-scrollbar-thumb{ background:#2f3a48; border-radius:8px; }
-    ::-webkit-scrollbar-thumb:hover{ background:#3d4c5e; }
-    ::-webkit-scrollbar-track{ background:transparent; }
-
-    @media (max-width:560px){
-        .head h1{ font-size:23px; }
-        .panel{ padding:16px; }
-        #list{ grid-template-columns:1fr; }
-        .thumb{ height:190px; }
-        .result-bar{ flex-direction:column; align-items:stretch; }
-        .result-bar .tools{ justify-content:stretch; }
-        .result-bar button{ flex:1; }
-    }
+@media (max-width: 520px){
+    .idx{ min-width: 52px; font-size: 11px; }
+    .text{ font-size: 13px; }
+    h1{ font-size: 16px; }
+    #searchInput{ padding-right: 80px; font-size: 13px; }
+}
 </style>
 </head>
 <body>
 
-<div class="wrap">
-    <div class="head">
-        <h1>TRÍCH XUẤT LINK ẢNH</h1>
-        <p>Kéo thả file hoặc dán nội dung — tự động tách các link ảnh (.png, .jpg, .gif, .webp...)</p>
-    </div>
-
-    <div class="panel">
-        <div class="drop" id="drop">
-            <div class="icon">🖼️</div>
-            <div class="txt">Kéo thả file vào đây hoặc <b>bấm để chọn file</b> — ảnh sẽ được trích xuất ngay</div>
-            <input type="file" id="fileInput" multiple hidden>
+<header>
+    <div class="wrap">
+        <div class="title-row">
+            <h1>TÌM KIẾM ITEM</h1>
+            <span class="count-badge" id="countBadge">0 item</span>
         </div>
 
-        <!-- thông báo file đã xử lý -->
-        <div class="file-status hidden" id="fileStatus">
-            <span>📁</span>
-            <span class="fs-text" id="fileStatusText"></span>
-            <button class="fs-clear" id="btnClearFiles" type="button">✕ Xoá file</button>
-        </div>
-
-        <textarea id="input" placeholder="Hoặc dán nội dung HTML / JSON / CSS / TXT ... vào đây rồi bấm Tách link ảnh..."></textarea>
-
-        <div class="toolbar">
-            <label class="chk">
-                <input type="checkbox" id="onlyUnique" checked>
-                Loại bỏ link trùng nhau
-            </label>
-            <div class="actions">
-                <button class="primary" id="btnExtract">⚡ Tách link ảnh</button>
-                <button id="btnClear">🗑 Xoá hết</button>
-            </div>
+        <div class="search-box">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+            <input id="searchInput" type="text" placeholder="Nhập nội dung hoặc số index..." autocomplete="off" spellcheck="false">
+            <button id="clearBtn" type="button">Xóa</button>
         </div>
     </div>
+</header>
 
-    <div class="result hidden" id="result">
-        <div class="result-bar">
-            <div class="count">
-                <span class="badge" id="count">0</span>
-                <span class="label">link ảnh được tìm thấy</span>
-            </div>
-            <div class="tools">
-                <button id="btnCopyAll">📋 Copy tất cả</button>
-                <button id="btnDownload">⬇ Tải .txt</button>
-            </div>
-        </div>
-        <ul id="list"></ul>
+<main>
+    <div class="wrap">
+        <div id="list"></div>
+        <div id="loading">Đang tải...</div>
+        <div id="sentinel"></div>
+    </div>
+</main>
+
+<!-- ===== OVERLAY NẠP DỮ LIỆU ===== -->
+<div id="loader" class="show">
+    <div class="loader-card">
+        <h2>Chưa có dữ liệu</h2>
+        <p>Đặt file <b>AzerstOB56VN.txt</b> cùng thư mục với file HTML này rồi mở lại trang.<br>Hoặc chọn file bên dưới:</p>
+
+        <label class="btn-file">
+            Chọn file .txt
+            <input type="file" id="fileInput" accept=".txt,text/plain" hidden>
+        </label>
+
+        <p class="hint">… hoặc kéo &amp; thả file vào đây</p>
+
+        <details>
+            <summary>Dán nội dung trực tiếp</summary>
+            <textarea id="pasteArea" placeholder="index&#9;text&#10;0&#9;Balo - Đại Đao Zabuza&#10;1&#9;Đã nâng cấp {0}"></textarea>
+            <button id="pasteBtn" type="button">Nạp dữ liệu</button>
+        </details>
     </div>
 </div>
 
@@ -573,340 +410,310 @@
 (function () {
     "use strict";
 
-    var drop            = document.getElementById('drop');
-    var fileInput       = document.getElementById('fileInput');
-    var input           = document.getElementById('input');
-    var onlyUnique      = document.getElementById('onlyUnique');
-    var btnExtract      = document.getElementById('btnExtract');
-    var btnClear        = document.getElementById('btnClear');
-    var resultBox       = document.getElementById('result');
-    var list            = document.getElementById('list');
-    var countEl         = document.getElementById('count');
-    var btnCopyAll      = document.getElementById('btnCopyAll');
-    var btnDownload     = document.getElementById('btnDownload');
-    var fileStatus      = document.getElementById('fileStatus');
-    var fileStatusText  = document.getElementById('fileStatusText');
-    var btnClearFiles   = document.getElementById('btnClearFiles');
+    /* ======================= TRẠNG THÁI ======================= */
+    var state = {
+        data: [],       // { i, text, n }
+        results: [],
+        rendered: 0,
+        pageSize: 100,
+        query: ""
+    };
 
-    var currentLinks = [];
-    var fileContents = []; // { name: string, content: string }
+    var el = function (id) { return document.getElementById(id); };
 
-    /* Regex tách link ảnh */
-    var IMG_RE = /[^\s"'`<>\\()\[\]{},;]+?\.(?:png|jpe?g|gif|webp|bmp|svg|avif|ico|tiff?|heic|heif|jfif|apng)(?:\?[^\s"'`<>\\()\[\]{},;]*)?(?![\w])/gi;
+    var listEl      = el("list");
+    var loadingEl   = el("loading");
+    var sentinelEl  = el("sentinel");
+    var countBadge  = el("countBadge");
+    var searchInput = el("searchInput");
+    var clearBtn    = el("clearBtn");
+    var loaderEl    = el("loader");
 
-    function extractLinks(text) {
-        if (!text) return [];
-        var clean = text
-            .replace(/\\\//g, '/')
-            .replace(/&amp;/gi, '&')
-            .replace(/&#x2F;/gi, '/')
-            .replace(/&#47;/g, '/')
-            .replace(/&quot;/gi, '"');
-
-        var found = clean.match(IMG_RE) || [];
-        return found.map(function (s) {
-            return s.replace(/[.,;:!?)\]}>]+$/, '');
-        }).filter(function (s) { return s.indexOf('.') > -1; });
+    /* ======================= CHUẨN HÓA TIẾNG VIỆT ======================= */
+    // Bỏ dấu, giữ nguyên độ dài chuỗi để highlight chính xác
+    function normChar(ch) {
+        var base = ch.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if (!base) base = ch;
+        var c = base.charAt(0).toLowerCase();
+        if (c === "đ") c = "d";
+        return c;
     }
 
-    function getExt(url) {
-        var m = url.match(/\.([a-z0-9]+)(?:\?|#|$)/i);
-        return m ? m[1].toLowerCase() : 'img';
+    function norm(str) {
+        var out = "";
+        for (var k = 0; k < str.length; k++) {
+            out += normChar(str.charAt(k));
+        }
+        return out;
     }
 
-    /* ----- cập nhật thanh trạng thái file ----- */
-    function updateFileStatus() {
-        if (!fileContents.length) {
-            fileStatus.classList.add('hidden');
+    function escapeHtml(s) {
+        return s.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+    }
+
+    /* ======================= PARSE DỮ LIỆU ======================= */
+    function parseData(raw) {
+        var lines = raw.split(/\r?\n/);
+        var arr = [];
+
+        for (var k = 0; k < lines.length; k++) {
+            var line = lines[k];
+            if (!line) continue;
+
+            var tab = line.indexOf("\t");
+            if (tab === -1) continue;
+
+            var idxStr = line.substring(0, tab).trim();
+            if (!/^\d+$/.test(idxStr)) continue; // bỏ dòng header "index text"
+
+            var content = line.substring(tab + 1);
+            if (content === "") continue;
+
+            arr.push({
+                i: parseInt(idxStr, 10),
+                text: content,
+                n: norm(content)
+            });
+        }
+        return arr;
+    }
+
+    /* ======================= RENDER ======================= */
+    function highlight(text, normText, q) {
+        if (!q) return escapeHtml(text);
+
+        var nq = norm(q);
+        if (!nq) return escapeHtml(text);
+
+        var out = "";
+        var pos = 0;
+        var idx;
+
+        while ((idx = normText.indexOf(nq, pos)) !== -1) {
+            out += escapeHtml(text.substring(pos, idx));
+            out += "<mark>" + escapeHtml(text.substr(idx, nq.length)) + "</mark>";
+            pos = idx + nq.length;
+        }
+        out += escapeHtml(text.substring(pos));
+        return out;
+    }
+
+    function makeRow(item, q) {
+        var row = document.createElement("div");
+        row.className = "item";
+
+        var idx = document.createElement("div");
+        idx.className = "idx";
+        idx.textContent = item.i;
+
+        var txt = document.createElement("div");
+        txt.className = "text";
+        txt.innerHTML = highlight(item.text, item.n, q);
+
+        row.appendChild(idx);
+        row.appendChild(txt);
+        return row;
+    }
+
+    function renderMore() {
+        if (state.rendered >= state.results.length) {
+            loadingEl.style.display = "none";
             return;
         }
-        fileStatus.classList.remove('hidden');
 
-        var names = fileContents.map(function (f) { return f.name; });
-        var summary = names.join(', ');
-        if (summary.length > 65) summary = summary.slice(0, 65) + '...';
-
-        fileStatusText.textContent =
-            'Đã đọc ' + fileContents.length + ' file: ' + summary;
-    }
-
-    function render(links) {
-        currentLinks = links;
-        list.innerHTML = '';
-        resultBox.classList.remove('hidden');
-        countEl.textContent = links.length;
-
-        if (!links.length) {
-            var empty = document.createElement('div');
-            empty.className = 'empty';
-            empty.innerHTML = '<span class="ico">🔍</span>Không tìm thấy link ảnh nào.';
-            list.appendChild(empty);
-            return;
-        }
-
+        var end = Math.min(state.rendered + state.pageSize, state.results.length);
         var frag = document.createDocumentFragment();
 
-        links.forEach(function (url, i) {
-            var li = document.createElement('li');
-            li.className = 'card';
-
-            var thumb = document.createElement('div');
-            thumb.className = 'thumb';
-
-            var idx = document.createElement('span');
-            idx.className = 'badge-idx';
-            idx.textContent = '#' + (i + 1);
-
-            var ext = document.createElement('span');
-            ext.className = 'badge-ext';
-            ext.textContent = getExt(url);
-
-            var img = document.createElement('img');
-            img.loading = 'lazy';
-            img.alt = 'Ảnh #' + (i + 1);
-            img.src = url;
-            img.onerror = function () {
-                var broken = document.createElement('div');
-                broken.className = 'broken';
-                broken.innerHTML = '<span>🖼️</span>Không tải được ảnh';
-                if (img.parentNode) img.parentNode.replaceChild(broken, img);
-            };
-
-            thumb.appendChild(idx);
-            thumb.appendChild(ext);
-            thumb.appendChild(img);
-
-            var body = document.createElement('div');
-            body.className = 'card-body';
-
-            var a = document.createElement('a');
-            a.className = 'url-line';
-            a.href = url;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            a.textContent = url;
-            a.title = url;
-
-            var acts = document.createElement('div');
-            acts.className = 'card-actions';
-
-            var btnCopy = document.createElement('button');
-            btnCopy.className = 'btn-copy';
-            btnCopy.type = 'button';
-            btnCopy.textContent = '📋 Copy';
-            btnCopy.addEventListener('click', function () {
-                copyText(url, function () {
-                    btnCopy.textContent = '✓ Đã copy';
-                    btnCopy.classList.add('done');
-                    setTimeout(function () {
-                        btnCopy.textContent = '📋 Copy';
-                        btnCopy.classList.remove('done');
-                    }, 1300);
-                });
-            });
-
-            var btnOpen = document.createElement('a');
-            btnOpen.className = 'btn-open';
-            btnOpen.href = url;
-            btnOpen.target = '_blank';
-            btnOpen.rel = 'noopener noreferrer';
-            btnOpen.textContent = '🔗 Mở';
-
-            acts.appendChild(btnCopy);
-            acts.appendChild(btnOpen);
-            body.appendChild(a);
-            body.appendChild(acts);
-
-            li.appendChild(thumb);
-            li.appendChild(body);
-            frag.appendChild(li);
-        });
-
-        list.appendChild(frag);
-    }
-
-    function copyText(text, done) {
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(text).then(done).catch(function () {
-                fallbackCopy(text); done();
-            });
-        } else {
-            fallbackCopy(text); done();
+        for (var k = state.rendered; k < end; k++) {
+            frag.appendChild(makeRow(state.results[k], state.query));
         }
+
+        listEl.appendChild(frag);
+        state.rendered = end;
+
+        loadingEl.style.display = (state.rendered < state.results.length) ? "block" : "none";
+        loadingEl.textContent = "Đang tải thêm... (" + state.rendered + "/" + state.results.length + ")";
     }
 
-    function fallbackCopy(text) {
-        var ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.top = '-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand('copy'); } catch (e) {}
-        document.body.removeChild(ta);
-    }
+    function applyFilter(q) {
+        state.query = q;
 
-    /* ============================================================
-       TRÍCH XUẤT — gộp cả nội dung textarea + tất cả file đã nạp
-       ============================================================ */
-    function runExtract() {
-        var pool = [];
+        var key = norm(q.trim());
 
-        // 1. Nội dung dán tay trong textarea
-        var typed = input.value.trim();
-        if (typed) pool.push(typed);
+        if (!key) {
+            state.results = state.data;
+        } else {
+            var res = [];
+            var data = state.data;
+            for (var k = 0; k < data.length; k++) {
+                var it = data[k];
+                if (it.n.indexOf(key) !== -1 || String(it.i).indexOf(key) !== -1) {
+                    res.push(it);
+                }
+            }
+            state.results = res;
+        }
 
-        // 2. Nội dung của tất cả file đã thả vào (KHÔNG đổ vào textarea)
-        fileContents.forEach(function (f) {
-            if (f.content) pool.push(f.content);
-        });
+        state.rendered = 0;
+        listEl.innerHTML = "";
 
-        if (!pool.length) {
-            resultBox.classList.add('hidden');
-            list.innerHTML = '';
-            currentLinks = [];
+        updateCount();
+
+        if (state.results.length === 0) {
+            loadingEl.style.display = "none";
+            listEl.innerHTML = '<div class="empty">Không tìm thấy kết quả nào phù hợp.<br>Thử một từ khóa khác nhé!</div>';
             return;
         }
 
-        var links = extractLinks(pool.join('\n\n'));
-
-        if (onlyUnique.checked) {
-            var seen = Object.create(null);
-            links = links.filter(function (u) {
-                var k = u.toLowerCase();
-                if (seen[k]) return false;
-                seen[k] = true;
-                return true;
-            });
-        }
-
-        render(links);
+        renderMore();
     }
 
-    /* ============================================================
-       ĐỌC FILE — tự động trích xuất, KHÔNG đổ vào textarea
-       ============================================================ */
-    function readFiles(fileList) {
-        var files = Array.prototype.slice.call(fileList || []);
-        if (!files.length) return;
-
-        var pending = files.length;
-        var newFiles = new Array(files.length);
-
-        files.forEach(function (file, index) {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-                newFiles[index] = {
-                    name: file.name,
-                    size: file.size,
-                    content: e.target.result || ''
-                };
-                pending--;
-                if (pending === 0) finish();
-            };
-
-            reader.onerror = function () {
-                newFiles[index] = {
-                    name: file.name,
-                    size: file.size,
-                    content: ''
-                };
-                pending--;
-                if (pending === 0) finish();
-            };
-
-            reader.readAsText(file, 'UTF-8');
-        });
-
-        function finish() {
-            // thêm các file vừa đọc vào danh sách
-            newFiles.forEach(function (f) {
-                if (f && f.content) fileContents.push(f);
-            });
-
-            updateFileStatus();
-            // Tự động trích xuất ngay — người dùng không phải bấm gì
-            runExtract();
+    function updateCount() {
+        if (!state.data.length) {
+            countBadge.textContent = "0 item";
+            return;
+        }
+        if (!state.query.trim()) {
+            countBadge.textContent = state.data.length + " item";
+        } else {
+            countBadge.textContent = state.results.length + " / " + state.data.length + " item";
         }
     }
 
-    /* ---------- Events ---------- */
-    drop.addEventListener('click', function () { fileInput.click(); });
+    /* ======================= NẠP DỮ LIỆU ======================= */
+    function loadText(raw) {
+        var arr = parseData(raw);
 
-    fileInput.addEventListener('change', function (e) {
-        readFiles(e.target.files);
-        fileInput.value = '';
+        if (!arr.length) {
+            alert("Không đọc được dữ liệu. Hãy kiểm tra lại định dạng file (index TAB text).");
+            return;
+        }
+
+        state.data = arr;
+        state.results = arr;
+        state.rendered = 0;
+        state.query = "";
+
+        searchInput.value = "";
+        clearBtn.classList.remove("show");
+        listEl.innerHTML = "";
+
+        loaderEl.classList.remove("show");
+        updateCount();
+        renderMore();
+    }
+
+    function readFile(file) {
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (e) { loadText(String(e.target.result)); };
+        reader.onerror = function () { alert("Đọc file thất bại!"); };
+        reader.readAsText(file, "UTF-8");
+    }
+
+    /* ======================= SỰ KIỆN ======================= */
+    // Ô tìm kiếm (debounce)
+    var timer = null;
+    searchInput.addEventListener("input", function () {
+        var v = searchInput.value;
+        clearBtn.classList.toggle("show", v.length > 0);
+
+        clearTimeout(timer);
+        timer = setTimeout(function () { applyFilter(v); }, 110);
     });
 
-    ['dragenter','dragover'].forEach(function (ev) {
-        drop.addEventListener(ev, function (e) {
-            e.preventDefault(); e.stopPropagation();
-            drop.classList.add('dragover');
+    clearBtn.addEventListener("click", function () {
+        searchInput.value = "";
+        clearBtn.classList.remove("show");
+        applyFilter("");
+        searchInput.focus();
+    });
+
+    searchInput.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+            searchInput.value = "";
+            clearBtn.classList.remove("show");
+            applyFilter("");
+        }
+    });
+
+    // Phím tắt "/" để focus ô tìm kiếm
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "/" && document.activeElement !== searchInput &&
+            document.activeElement !== el("pasteArea")) {
+            e.preventDefault();
+            searchInput.focus();
+        }
+    });
+
+    // Chọn file
+    el("fileInput").addEventListener("change", function (e) {
+        readFile(e.target.files[0]);
+    });
+
+    // Dán nội dung
+    el("pasteBtn").addEventListener("click", function () {
+        var v = el("pasteArea").value;
+        if (!v.trim()) { alert("Nội dung trống!"); return; }
+        loadText(v);
+    });
+
+    // Kéo & thả
+    ["dragenter", "dragover"].forEach(function (ev) {
+        window.addEventListener(ev, function (e) {
+            e.preventDefault();
+            loaderEl.classList.add("drop-active");
         });
     });
-
-    ['dragleave','drop'].forEach(function (ev) {
-        drop.addEventListener(ev, function (e) {
-            e.preventDefault(); e.stopPropagation();
-            if (ev === 'dragleave' && drop.contains(e.relatedTarget)) return;
-            drop.classList.remove('dragover');
+    ["dragleave", "drop"].forEach(function (ev) {
+        window.addEventListener(ev, function (e) {
+            e.preventDefault();
+            if (ev === "dragleave" && e.relatedTarget) return;
+            loaderEl.classList.remove("drop-active");
         });
     });
-
-    drop.addEventListener('drop', function (e) {
+    window.addEventListener("drop", function (e) {
+        e.preventDefault();
         if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
-            readFiles(e.dataTransfer.files);
+            readFile(e.dataTransfer.files[0]);
         }
     });
 
-    window.addEventListener('dragover', function (e) { e.preventDefault(); });
-    window.addEventListener('drop', function (e) { e.preventDefault(); });
-
-    // Nút "Tách link ảnh" — trích xuất từ textarea + file đã nạp
-    btnExtract.addEventListener('click', runExtract);
-
-    // Xoá file đã nạp (giữ textarea)
-    btnClearFiles.addEventListener('click', function () {
-        fileContents = [];
-        updateFileStatus();
-        runExtract();
-    });
-
-    // Xoá tất cả
-    btnClear.addEventListener('click', function () {
-        input.value = '';
-        fileContents = [];
-        updateFileStatus();
-        list.innerHTML = '';
-        currentLinks = [];
-        resultBox.classList.add('hidden');
-        input.focus();
-    });
-
-    btnCopyAll.addEventListener('click', function () {
-        if (!currentLinks.length) return;
-        copyText(currentLinks.join('\n'), function () {
-            btnCopyAll.textContent = '✓ Đã copy ' + currentLinks.length + ' link';
-            setTimeout(function () {
-                btnCopyAll.textContent = '📋 Copy tất cả';
-            }, 1500);
+    // Vô hạn cuộn
+    if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) renderMore();
+            });
+        }, { rootMargin: "600px 0px" });
+        io.observe(sentinelEl);
+    } else {
+        window.addEventListener("scroll", function () {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 700) {
+                renderMore();
+            }
         });
-    });
+    }
 
-    btnDownload.addEventListener('click', function () {
-        if (!currentLinks.length) return;
-        var blob = new Blob([currentLinks.join('\n')], { type: 'text/plain;charset=utf-8' });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = 'image-links.txt';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-    });
+    /* ======================= TỰ ĐỘNG TẢI FILE ======================= */
+    // Thử fetch file cùng thư mục (chỉ hoạt động khi chạy qua http/https)
+    fetch("AzerstOB56VN.txt", { cache: "no-cache" })
+        .then(function (r) {
+            if (!r.ok) throw new Error("not found");
+            return r.text();
+        })
+        .then(function (text) {
+            if (text && text.indexOf("\t") !== -1) loadText(text);
+        })
+        .catch(function () {
+            // Chạy bằng file:// hoặc không tìm thấy file → hiện overlay nạp dữ liệu
+            loaderEl.classList.add("show");
+        });
 
+    loadingEl.style.display = "none";
 })();
 </script>
 </body>
