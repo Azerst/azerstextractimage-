@@ -44,7 +44,6 @@
 
     .wrap{ max-width:1020px; margin:0 auto; }
 
-    /* ---------- Header ---------- */
     .head{ text-align:center; margin-bottom:26px; }
 
     .head h1{
@@ -64,7 +63,6 @@
         font-size:14px;
     }
 
-    /* ---------- Panel ---------- */
     .panel{
         background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
         border:1px solid var(--line);
@@ -103,6 +101,45 @@
 
     .drop .txt{ font-size:14.5px; color:var(--muted); }
     .drop .txt b{ color:var(--acc); }
+
+    /* --- file status indicator --- */
+    .file-status{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        margin-top:12px;
+        padding:10px 14px;
+        border-radius:11px;
+        background:rgba(46,204,113,.08);
+        border:1px solid rgba(46,204,113,.3);
+        font-size:13px;
+        color:#a5e7c1;
+        animation:fade .25s ease;
+    }
+
+    .file-status .fs-text{
+        flex:1;
+        min-width:0;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+    }
+
+    .file-status .fs-clear{
+        padding:4px 10px;
+        font-size:12px;
+        border-radius:7px;
+        background:rgba(255,255,255,.06);
+        border:1px solid rgba(255,255,255,.12);
+        color:#eef3f9;
+        cursor:pointer;
+        transition:.15s;
+    }
+
+    .file-status .fs-clear:hover{
+        background:rgba(255,80,80,.25);
+        border-color:rgba(255,80,80,.5);
+    }
 
     textarea{
         width:100%;
@@ -188,7 +225,7 @@
     }
 
     /* ============================================================
-       KẾT QUẢ — THIẾT KẾ ĐẸP
+       KẾT QUẢ
        ============================================================ */
     .result{
         margin-top:30px;
@@ -200,7 +237,6 @@
         to{ opacity:1; transform:translateY(0); }
     }
 
-    /* thanh thông tin trên cùng */
     .result-bar{
         display:flex;
         align-items:center;
@@ -259,7 +295,6 @@
         color:#ffc78a;
     }
 
-    /* ---------- Grid card ---------- */
     #list{
         list-style:none;
         margin:0;
@@ -302,13 +337,11 @@
             0 0 30px rgba(255,77,0,.12);
     }
 
-    /* ảnh minh họa lớn phía trên card */
     .thumb{
         position:relative;
         width:100%;
         height:170px;
-        background:
-            linear-gradient(135deg, #1a2330, #141b25);
+        background:linear-gradient(135deg, #1a2330, #141b25);
         overflow:hidden;
         border-bottom:1px solid var(--line);
         display:flex;
@@ -316,7 +349,6 @@
         justify-content:center;
     }
 
-    /* checker pattern cho ảnh trong suốt */
     .thumb::before{
         content:'';
         position:absolute;
@@ -359,7 +391,6 @@
         filter:grayscale(.6);
     }
 
-    /* badge số thứ tự góc trên trái */
     .badge-idx{
         position:absolute;
         top:10px;
@@ -379,7 +410,6 @@
         letter-spacing:.5px;
     }
 
-    /* badge đuôi file góc trên phải */
     .badge-ext{
         position:absolute;
         top:10px;
@@ -396,7 +426,6 @@
         backdrop-filter:blur(6px);
     }
 
-    /* phần thân card: link + nút copy */
     .card-body{
         padding:12px 14px 14px;
         display:flex;
@@ -453,7 +482,6 @@
         color:#0a0e14;
     }
 
-    /* empty */
     .empty{
         grid-column:1 / -1;
         padding:40px 20px;
@@ -474,7 +502,6 @@
 
     .hidden{ display:none !important; }
 
-    /* scrollbar */
     ::-webkit-scrollbar{ width:9px; height:9px; }
     ::-webkit-scrollbar-thumb{ background:#2f3a48; border-radius:8px; }
     ::-webkit-scrollbar-thumb:hover{ background:#3d4c5e; }
@@ -502,11 +529,18 @@
     <div class="panel">
         <div class="drop" id="drop">
             <div class="icon">🖼️</div>
-            <div class="txt">Kéo thả file vào đây hoặc <b>bấm để chọn file</b></div>
+            <div class="txt">Kéo thả file vào đây hoặc <b>bấm để chọn file</b> — ảnh sẽ được trích xuất ngay</div>
             <input type="file" id="fileInput" multiple hidden>
         </div>
 
-        <textarea id="input" placeholder="Dán nội dung HTML / JSON / CSS / TXT ... vào đây..."></textarea>
+        <!-- thông báo file đã xử lý -->
+        <div class="file-status hidden" id="fileStatus">
+            <span>📁</span>
+            <span class="fs-text" id="fileStatusText"></span>
+            <button class="fs-clear" id="btnClearFiles" type="button">✕ Xoá file</button>
+        </div>
+
+        <textarea id="input" placeholder="Hoặc dán nội dung HTML / JSON / CSS / TXT ... vào đây rồi bấm Tách link ảnh..."></textarea>
 
         <div class="toolbar">
             <label class="chk">
@@ -515,7 +549,7 @@
             </label>
             <div class="actions">
                 <button class="primary" id="btnExtract">⚡ Tách link ảnh</button>
-                <button id="btnClear">🗑 Xoá</button>
+                <button id="btnClear">🗑 Xoá hết</button>
             </div>
         </div>
     </div>
@@ -539,20 +573,25 @@
 (function () {
     "use strict";
 
-    var drop        = document.getElementById('drop');
-    var fileInput   = document.getElementById('fileInput');
-    var input       = document.getElementById('input');
-    var onlyUnique  = document.getElementById('onlyUnique');
-    var btnExtract  = document.getElementById('btnExtract');
-    var btnClear    = document.getElementById('btnClear');
-    var resultBox   = document.getElementById('result');
-    var list        = document.getElementById('list');
-    var countEl     = document.getElementById('count');
-    var btnCopyAll  = document.getElementById('btnCopyAll');
-    var btnDownload = document.getElementById('btnDownload');
+    var drop            = document.getElementById('drop');
+    var fileInput       = document.getElementById('fileInput');
+    var input           = document.getElementById('input');
+    var onlyUnique      = document.getElementById('onlyUnique');
+    var btnExtract      = document.getElementById('btnExtract');
+    var btnClear        = document.getElementById('btnClear');
+    var resultBox       = document.getElementById('result');
+    var list            = document.getElementById('list');
+    var countEl         = document.getElementById('count');
+    var btnCopyAll      = document.getElementById('btnCopyAll');
+    var btnDownload     = document.getElementById('btnDownload');
+    var fileStatus      = document.getElementById('fileStatus');
+    var fileStatusText  = document.getElementById('fileStatusText');
+    var btnClearFiles   = document.getElementById('btnClearFiles');
 
     var currentLinks = [];
+    var fileContents = []; // { name: string, content: string }
 
+    /* Regex tách link ảnh */
     var IMG_RE = /[^\s"'`<>\\()\[\]{},;]+?\.(?:png|jpe?g|gif|webp|bmp|svg|avif|ico|tiff?|heic|heif|jfif|apng)(?:\?[^\s"'`<>\\()\[\]{},;]*)?(?![\w])/gi;
 
     function extractLinks(text) {
@@ -575,6 +614,22 @@
         return m ? m[1].toLowerCase() : 'img';
     }
 
+    /* ----- cập nhật thanh trạng thái file ----- */
+    function updateFileStatus() {
+        if (!fileContents.length) {
+            fileStatus.classList.add('hidden');
+            return;
+        }
+        fileStatus.classList.remove('hidden');
+
+        var names = fileContents.map(function (f) { return f.name; });
+        var summary = names.join(', ');
+        if (summary.length > 65) summary = summary.slice(0, 65) + '...';
+
+        fileStatusText.textContent =
+            'Đã đọc ' + fileContents.length + ' file: ' + summary;
+    }
+
     function render(links) {
         currentLinks = links;
         list.innerHTML = '';
@@ -584,7 +639,7 @@
         if (!links.length) {
             var empty = document.createElement('div');
             empty.className = 'empty';
-            empty.innerHTML = '<span class="ico">🔍</span>Không tìm thấy link ảnh nào trong nội dung.';
+            empty.innerHTML = '<span class="ico">🔍</span>Không tìm thấy link ảnh nào.';
             list.appendChild(empty);
             return;
         }
@@ -595,7 +650,6 @@
             var li = document.createElement('li');
             li.className = 'card';
 
-            /* --- vùng ảnh --- */
             var thumb = document.createElement('div');
             thumb.className = 'thumb';
 
@@ -622,7 +676,6 @@
             thumb.appendChild(ext);
             thumb.appendChild(img);
 
-            /* --- thân card --- */
             var body = document.createElement('div');
             body.className = 'card-body';
 
@@ -661,7 +714,6 @@
 
             acts.appendChild(btnCopy);
             acts.appendChild(btnOpen);
-
             body.appendChild(a);
             body.appendChild(acts);
 
@@ -694,8 +746,30 @@
         document.body.removeChild(ta);
     }
 
+    /* ============================================================
+       TRÍCH XUẤT — gộp cả nội dung textarea + tất cả file đã nạp
+       ============================================================ */
     function runExtract() {
-        var links = extractLinks(input.value);
+        var pool = [];
+
+        // 1. Nội dung dán tay trong textarea
+        var typed = input.value.trim();
+        if (typed) pool.push(typed);
+
+        // 2. Nội dung của tất cả file đã thả vào (KHÔNG đổ vào textarea)
+        fileContents.forEach(function (f) {
+            if (f.content) pool.push(f.content);
+        });
+
+        if (!pool.length) {
+            resultBox.classList.add('hidden');
+            list.innerHTML = '';
+            currentLinks = [];
+            return;
+        }
+
+        var links = extractLinks(pool.join('\n\n'));
+
         if (onlyUnique.checked) {
             var seen = Object.create(null);
             links = links.filter(function (u) {
@@ -705,39 +779,59 @@
                 return true;
             });
         }
+
         render(links);
     }
 
+    /* ============================================================
+       ĐỌC FILE — tự động trích xuất, KHÔNG đổ vào textarea
+       ============================================================ */
     function readFiles(fileList) {
         var files = Array.prototype.slice.call(fileList || []);
         if (!files.length) return;
 
-        var results = new Array(files.length);
-        var done = 0;
+        var pending = files.length;
+        var newFiles = new Array(files.length);
 
         files.forEach(function (file, index) {
             var reader = new FileReader();
+
             reader.onload = function (e) {
-                results[index] = e.target.result || '';
-                done++;
-                if (done === files.length) finish();
+                newFiles[index] = {
+                    name: file.name,
+                    size: file.size,
+                    content: e.target.result || ''
+                };
+                pending--;
+                if (pending === 0) finish();
             };
+
             reader.onerror = function () {
-                done++;
-                if (done === files.length) finish();
+                newFiles[index] = {
+                    name: file.name,
+                    size: file.size,
+                    content: ''
+                };
+                pending--;
+                if (pending === 0) finish();
             };
+
             reader.readAsText(file, 'UTF-8');
         });
 
         function finish() {
-            var joined = results.filter(Boolean).join('\n\n');
-            input.value = input.value.trim()
-                ? input.value + '\n\n' + joined
-                : joined;
+            // thêm các file vừa đọc vào danh sách
+            newFiles.forEach(function (f) {
+                if (f && f.content) fileContents.push(f);
+            });
+
+            updateFileStatus();
+            // Tự động trích xuất ngay — người dùng không phải bấm gì
             runExtract();
         }
     }
 
+    /* ---------- Events ---------- */
     drop.addEventListener('click', function () { fileInput.click(); });
 
     fileInput.addEventListener('change', function (e) {
@@ -769,10 +863,21 @@
     window.addEventListener('dragover', function (e) { e.preventDefault(); });
     window.addEventListener('drop', function (e) { e.preventDefault(); });
 
+    // Nút "Tách link ảnh" — trích xuất từ textarea + file đã nạp
     btnExtract.addEventListener('click', runExtract);
 
+    // Xoá file đã nạp (giữ textarea)
+    btnClearFiles.addEventListener('click', function () {
+        fileContents = [];
+        updateFileStatus();
+        runExtract();
+    });
+
+    // Xoá tất cả
     btnClear.addEventListener('click', function () {
         input.value = '';
+        fileContents = [];
+        updateFileStatus();
         list.innerHTML = '';
         currentLinks = [];
         resultBox.classList.add('hidden');
