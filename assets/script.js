@@ -21,6 +21,15 @@ const BP105 = [
   'BP_GRANDPrize06_105.jpg','BP_GRANDPrize07_105.jpg'
 ];
 
+const BP106 = [
+  'BP_Prize_106.png','BP_Task_FP_106.png','BP_106.png','BP_Window_PP_106.png',
+  'BP_Premium_icon_106.png','BP_Icon_free_106.png','subtype36_106.jpg',
+  'subtype1_106.jpg','subtype2_106.jpg','subtype3_106.jpg','subtype7_106.jpg',
+  'BP_Premium_title_106.png','BP_GRANDPrize01_106.jpg','BP_GRANDPrize02_106.jpg',
+  'BP_GRANDPrize03_106.jpg','BP_GRANDPrize04_106.jpg','BP_GRANDPrize05_106.jpg',
+  'BP_GRANDPrize06_106.jpg','BP_GRANDPrize07_106.jpg'
+];
+
 /* =========================================================
    BUILD URLs
 ========================================================= */
@@ -119,6 +128,7 @@ function attachImageHandlers(container) {
 
 renderGrid(document.getElementById('grid-t1'), 'BP104', BP104);
 renderGrid(document.getElementById('grid-t2'), 'BP105', BP105);
+renderGrid(document.getElementById('grid-t3'), 'BP106', BP106);
 
 document.addEventListener('error', e => {
   if (e.target && e.target.tagName === 'IMG') {
@@ -134,7 +144,8 @@ document.addEventListener('error', e => {
   const tabs = document.querySelectorAll('.tab');
   const panels = {
     t1: document.getElementById('panel-t1'),
-    t2: document.getElementById('panel-t2')
+    t2: document.getElementById('panel-t2'),
+    t3: document.getElementById('panel-t3')
   };
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -216,7 +227,6 @@ const modalDl    = document.getElementById('modalDl');
 let currentUrl = '';
 let currentFilename = '';
 
-/* ---------- LOAD IMAGE → BLOB ---------- */
 async function loadImageSafely(url, imgEl, mediaEl) {
   if (imgEl.dataset.blobUrl) {
     try { URL.revokeObjectURL(imgEl.dataset.blobUrl); } catch (e) {}
