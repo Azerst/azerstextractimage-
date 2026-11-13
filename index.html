@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
   <meta name="referrer" content="no-referrer" />
   <title>AZERST — Booyah Pass</title>
@@ -16,15 +16,18 @@
 </head>
 <body>
 
+  <!-- BACKGROUND GLOW -->
   <div class="bg-glow" aria-hidden="true"><span class="g3"></span></div>
 
   <main class="page">
 
+    <!-- HERO -->
     <header class="hero">
       <h1 class="hero-title">AZERST</h1>
       <p class="hero-sub">BOOYAH PASS GALLERY</p>
     </header>
 
+    <!-- TABS -->
     <div class="tabs" role="tablist" aria-label="Chọn Booyah Pass">
       <button class="tab is-active" data-tab="t1" role="tab" aria-selected="true" aria-controls="panel-t1" type="button">
         <span class="tab-prefix">BOOYAH</span>
@@ -36,6 +39,7 @@
       </button>
     </div>
 
+    <!-- PANEL T1 -->
     <section class="panel is-active" id="panel-t1" role="tabpanel">
       <header class="panel-title">
         <h2>
@@ -46,6 +50,7 @@
       <div class="grid" id="grid-t1"></div>
     </section>
 
+    <!-- PANEL T2 -->
     <section class="panel" id="panel-t2" role="tabpanel">
       <header class="panel-title">
         <h2>
@@ -56,6 +61,7 @@
       <div class="grid" id="grid-t2"></div>
     </section>
 
+    <!-- FOOTER -->
     <footer class="page-footer">
       <p class="copy">© 2026 <strong>AZERST</strong> — ALL RIGHTS RESERVED</p>
     </footer>
@@ -86,6 +92,17 @@
 
   <!-- TOAST -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- GUARD OVERLAY (hiện khi phát hiện F12 / DevTools) -->
+  <div class="guard-overlay" id="guardOverlay" role="alertdialog" aria-modal="true" aria-hidden="true">
+    <div class="guard-card">
+      <div class="guard-icon">!</div>
+      <h2 class="guard-title">PHÁT HIỆN TRUY CẬP TRÁI PHÉP</h2>
+      <p class="guard-desc">Bạn đang cố mở công cụ nhà phát triển.</p>
+      <div class="guard-countdown" id="guardCountdown">4</div>
+      <p class="guard-note">Trang sẽ tự động tải lại sau 4 giây</p>
+    </div>
+  </div>
 
   <script src="./assets/script.js" defer></script>
   <script src="./assets/guard.js" defer></script>
