@@ -596,6 +596,29 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:700}
   margin-top:10px;
 }
 
+/* =========================================================
+   CHẶN KÉO ẢNH + CHẶN TƯƠNG TÁC ẢNH TRONG MODAL
+========================================================= */
+.item-media img,
+.modal-media img{
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: none; /* click xuyên qua ảnh → tới parent (div .item-media), không phải link */
+}
+
+/* Nút Xem không có bất kỳ hành vi link */
+.btn-view{
+  text-decoration: none !important;
+}
+
 /* ============ RESPONSIVE ============ */
 
 @media (max-width:520px){
@@ -726,22 +749,5 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:700}
   *{animation:none !important; transition:none !important}
   .hero-title, .modal-brand-name, .title-month, .tab-month{
     -webkit-text-fill-color:var(--red); color:var(--red); background:none;
-  /* =========================================================
-   CHẶN KÉO ẢNH + CHẶN TƯƠNG TÁC ẢNH TRONG MODAL
-========================================================= */
-.item-media img,
-.modal-media img{
-  -webkit-user-drag: none;
-  -khtml-user-drag: none;
-  -moz-user-drag: none;
-  -o-user-drag: none;
-  user-drag: none;
-  user-select: none;
-  -webkit-user-select: none;
-  pointer-events: none; /* click xuyên qua ảnh → tới parent (div), không phải link */
-}
-
-/* Nút Xem không được có bất kỳ hành vi link */
-.btn-view{
-  text-decoration: none !important;
+  }
 }
