@@ -1,7 +1,7 @@
 'use strict';
 
 /* =========================================================
-   DATA
+   DATA — 3 THÁNG
 ========================================================= */
 const BP104 = [
   'BP_Prize_104.png','BP_Task_FP_104.png','BP_104.png','BP_Window_PP_104.png',
@@ -138,7 +138,7 @@ document.addEventListener('error', e => {
 }, true);
 
 /* =========================================================
-   TABS
+   TABS — 3 THÁNG
 ========================================================= */
 (function initTabs(){
   const tabs = document.querySelectorAll('.tab');
