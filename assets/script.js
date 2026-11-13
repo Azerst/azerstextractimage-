@@ -1,7 +1,7 @@
 'use strict';
 
 /* =========================================================
-   DATA
+   DATA — 3 THÁNG
 ========================================================= */
 const BP104 = [
   'BP_Prize_104.png','BP_Task_FP_104.png','BP_104.png','BP_Window_PP_104.png',
@@ -126,61 +126,9 @@ function attachImageHandlers(container) {
   });
 }
 
-/* =========================================================
-   SETUP EMPTY STATE — tự động phát hiện khi TẤT CẢ ảnh lỗi
-========================================================= */
-function setupGridEmptyState(gridEl, emptyEl) {
-  if (!gridEl || !emptyEl) return;
-  const imgs = gridEl.querySelectorAll('img');
-  const total = imgs.length;
-  if (total === 0) return;
-
-  let loaded = 0;
-  let failed = 0;
-
-  const check = () => {
-    if (loaded + failed < total) return;
-    if (loaded === 0) {
-      // Tất cả ảnh đều lỗi → hiện empty state
-      gridEl.style.display = 'none';
-      emptyEl.style.display = 'flex';
-      emptyEl.setAttribute('aria-hidden', 'false');
-    }
-  };
-
-  imgs.forEach(img => {
-    if (img.complete) {
-      if (img.naturalWidth > 0) loaded++;
-      else failed++;
-      check();
-    } else {
-      img.addEventListener('load',  () => { loaded++; check(); }, { once: true });
-      img.addEventListener('error', () => { failed++; check(); }, { once: true });
-    }
-  });
-
-  // Timeout dự phòng — sau 6s nếu vẫn chưa có ảnh nào load → hiện empty
-  setTimeout(() => {
-    if (loaded + failed < total) {
-      if (loaded === 0) {
-        gridEl.style.display = 'none';
-        emptyEl.style.display = 'flex';
-        emptyEl.setAttribute('aria-hidden', 'false');
-      }
-    }
-  }, 6000);
-}
-
-/* =========================================================
-   INIT
-========================================================= */
 renderGrid(document.getElementById('grid-t1'), 'BP104', BP104);
 renderGrid(document.getElementById('grid-t2'), 'BP105', BP105);
 renderGrid(document.getElementById('grid-t3'), 'BP106', BP106);
-
-setupGridEmptyState(document.getElementById('grid-t1'), document.getElementById('empty-t1'));
-setupGridEmptyState(document.getElementById('grid-t2'), document.getElementById('empty-t2'));
-setupGridEmptyState(document.getElementById('grid-t3'), document.getElementById('empty-t3'));
 
 document.addEventListener('error', e => {
   if (e.target && e.target.tagName === 'IMG') {
