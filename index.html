@@ -2,12 +2,13 @@
 <html lang="vi" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
   <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#eef2f6" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0a0f1e" media="(prefers-color-scheme: dark)" />
   <title>AZERST — Booyah Pass</title>
 
-  <!-- Theme init — chạy đồng bộ TRƯỚC CSS để không nháy trắng -->
   <script src="./assets/theme-init.js"></script>
 
   <link rel="preload" as="font" type="font/woff2" crossorigin
@@ -19,12 +20,7 @@
 </head>
 <body>
 
-  <!-- ============================================================
-       THEME TOGGLE
-       - Chỉ 1 thẻ <button> duy nhất
-       - KHÔNG bọc trong <div>
-       - KHÔNG dùng filter
-       ============================================================ -->
+  <!-- THEME TOGGLE — 1 button duy nhất, không wrapper -->
   <button class="theme-toggle" id="themeToggle" type="button" aria-label="Đổi giao diện sáng / tối">
     <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
@@ -35,18 +31,15 @@
     </svg>
   </button>
 
-  <!-- BACKGROUND GLOW -->
   <div class="bg-glow" aria-hidden="true"><span class="g3"></span></div>
 
   <main class="page">
 
-    <!-- HERO -->
     <header class="hero">
       <h1 class="hero-title">AZERST</h1>
       <p class="hero-sub">BOOYAH PASS GALLERY</p>
     </header>
 
-    <!-- TABS -->
     <div class="tabs" role="tablist" aria-label="Chọn Booyah Pass">
       <button class="tab is-active" data-tab="t1" role="tab" aria-selected="true" aria-controls="panel-t1" type="button">
         <span class="tab-prefix">BOOYAH</span>
@@ -58,7 +51,6 @@
       </button>
     </div>
 
-    <!-- PANEL T1 -->
     <section class="panel is-active" id="panel-t1" role="tabpanel">
       <header class="panel-title">
         <h2>
@@ -69,7 +61,6 @@
       <div class="grid" id="grid-t1"></div>
     </section>
 
-    <!-- PANEL T2 -->
     <section class="panel" id="panel-t2" role="tabpanel">
       <header class="panel-title">
         <h2>
@@ -80,14 +71,12 @@
       <div class="grid" id="grid-t2"></div>
     </section>
 
-    <!-- FOOTER -->
     <footer class="page-footer">
       <p class="copy">© 2026 <strong>AZERST</strong> — ALL RIGHTS RESERVED</p>
     </footer>
 
   </main>
 
-  <!-- MODAL -->
   <div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-inner">
       <button class="modal-close" id="modalClose" type="button" aria-label="Đóng">
@@ -109,10 +98,8 @@
     </div>
   </div>
 
-  <!-- TOAST -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <!-- GUARD OVERLAY -->
   <div class="guard-overlay" id="guardOverlay" role="alertdialog" aria-modal="true" aria-hidden="true">
     <div class="guard-card">
       <div class="guard-icon">!</div>
