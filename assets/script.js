@@ -2,9 +2,6 @@
 
 /* =========================================================
    DATA — 3 THÁNG
-   - BP104: 18 file
-   - BP105: 19 file
-   - BP106: 19 file
 ========================================================= */
 const BP104 = [
   'BP_Prize_104.png','BP_Task_FP_104.png','BP_104.png','BP_Window_PP_104.png',
@@ -34,9 +31,7 @@ const BP106 = [
 ];
 
 /* =========================================================
-   BUILD URLs — tự chọn domain theo tên file
-   - subtype7_*, BP_Premium_title_*, BP_GRANDPrize* → dl.dir.freefiremobile.com
-   - còn lại → dl-tata.freefireind.in
+   BUILD URLs
 ========================================================= */
 function buildUrl(bp, file) {
   const isDir = /^subtype7_|^BP_Premium_title_|^BP_GRANDPrize/.test(file);
@@ -87,7 +82,8 @@ function verifyImage(url) {
 }
 
 /* =========================================================
-   RENDER GRID — dùng chung cho cả 3 tháng
+   RENDER GRID
+   Mỗi ảnh có draggable="false" để không kéo được
 ========================================================= */
 function renderGrid(gridEl, bp, files) {
   if (!gridEl) return;
@@ -96,7 +92,7 @@ function renderGrid(gridEl, bp, files) {
     return `
       <article class="item">
         <div class="item-media" data-url="${url}" data-filename="${file}" role="button" tabindex="0" aria-label="Xem ảnh">
-          <img src="${url}" alt="AZERST" loading="lazy" />
+          <img src="${url}" alt="AZERST" loading="lazy" draggable="false" />
           <div class="pending">Đang cập nhật</div>
         </div>
         <div class="item-actions">
@@ -131,9 +127,6 @@ function attachImageHandlers(container) {
   });
 }
 
-/* =========================================================
-   INIT — render 3 tháng giống hệt nhau
-========================================================= */
 renderGrid(document.getElementById('grid-t1'), 'BP104', BP104);
 renderGrid(document.getElementById('grid-t2'), 'BP105', BP105);
 renderGrid(document.getElementById('grid-t3'), 'BP106', BP106);
@@ -146,7 +139,7 @@ document.addEventListener('error', e => {
 }, true);
 
 /* =========================================================
-   TABS — chuyển đổi giữa 3 tháng
+   TABS
 ========================================================= */
 (function initTabs(){
   const tabs = document.querySelectorAll('.tab');
@@ -179,7 +172,7 @@ function findMediaByUrl(url) {
 }
 
 /* =========================================================
-   DOWNLOAD
+   DOWNLOAD — KHÔNG dùng window.open / không điều hướng
 ========================================================= */
 async function downloadFile(url, origFilename, btn) {
   const media = findMediaByUrl(url);
@@ -199,6 +192,7 @@ async function downloadFile(url, origFilename, btn) {
     const a = document.createElement('a');
     a.href = objectUrl;
     a.download = saveName;
+    a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -207,7 +201,7 @@ async function downloadFile(url, origFilename, btn) {
     if (btn) btn.classList.remove('is-loading');
     return;
   } catch (err) {
-    /* fallback */
+    /* fallback không dùng window.open */
   }
 
   const exists = await verifyImage(url);
@@ -220,6 +214,7 @@ async function downloadFile(url, origFilename, btn) {
     return;
   }
 
+  /* Ảnh tồn tại nhưng bị CORS → KHÔNG mở link, chỉ thông báo */
   showToast('Không thể tải ảnh. Vui lòng thử lại sau', 'error');
 }
 
@@ -257,7 +252,7 @@ async function loadImageSafely(url, imgEl, mediaEl) {
     mediaEl.classList.add('is-error');
     return;
   } catch (err) {
-    /* fallback */
+    /* fallback - vẫn dùng ảnh gốc nhưng trong modal, không chuyển trang */
   }
 
   imgEl.src = url;
@@ -323,26 +318,69 @@ window.addEventListener('popstate', () => {
 });
 
 /* =========================================================
-   EVENTS
+   EVENTS — CHẶN MỌI HÌNH THỨC CHUYỂN TRANG
+   Dùng { capture: true } để chặn TRƯỚC mọi handler khác
 ========================================================= */
+
+/* 1) Click chuột trái — chỉ mở modal */
 document.addEventListener('click', e => {
   const trigger = e.target.closest('.btn-view, .item-media');
   if (!trigger) return;
   e.preventDefault();
   e.stopPropagation();
+  if (e.stopImmediatePropagation) e.stopImmediatePropagation();
   openModal(trigger.dataset.url, trigger.dataset.filename);
-});
+}, true);
 
+/* 2) Chuột giữa / Ctrl+click / Shift+click — chặn mở tab mới */
+document.addEventListener('auxclick', e => {
+  const trigger = e.target.closest('.btn-view, .item-media');
+  if (!trigger) return;
+  e.preventDefault();
+  e.stopPropagation();
+  if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+}, true);
+
+/* 3) Kéo ảnh → chặn */
+document.addEventListener('dragstart', e => {
+  if (e.target && e.target.tagName === 'IMG') {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}, true);
+
+/* 4) Chuột phải trên ảnh / nút → chặn menu ngữ cảnh (không cho "Open image in new tab") */
+document.addEventListener('contextmenu', e => {
+  const trigger = e.target.closest('.item-media, .btn-view, .modal-media img');
+  if (!trigger) return;
+  e.preventDefault();
+  e.stopPropagation();
+}, true);
+
+/* 5) Ảnh trong modal — chặn mọi tương tác (không thể điều hướng) */
+if (modalImg) {
+  ['click', 'auxclick', 'dragstart', 'contextmenu'].forEach(evt => {
+    modalImg.addEventListener(evt, e => {
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
+  });
+}
+
+/* 6) Nút Tải trong grid */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.btn-dl');
   if (!btn) return;
   e.preventDefault();
   e.stopPropagation();
+  if (e.stopImmediatePropagation) e.stopImmediatePropagation();
   downloadFile(btn.dataset.url, btn.dataset.filename, btn);
-});
+}, true);
 
+/* 7) Modal close */
 modalClose.addEventListener('click', closeModal);
 
+/* 8) Modal download */
 modalDl.addEventListener('click', e => {
   e.preventDefault();
   e.stopPropagation();
@@ -353,18 +391,22 @@ modalDl.addEventListener('click', e => {
   downloadFile(currentUrl, currentFilename, modalDl);
 });
 
+/* 9) Click ra ngoài modal → đóng */
 modal.addEventListener('click', e => {
   if (e.target === modal) closeModal();
 });
 
+/* 10) Escape → đóng modal */
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
 });
 
+/* 11) Enter / Space trên item-media → mở modal */
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter' && e.key !== ' ') return;
   const media = e.target.closest('.item-media');
   if (!media) return;
   e.preventDefault();
+  e.stopPropagation();
   openModal(media.dataset.url, media.dataset.filename);
 });
