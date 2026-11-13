@@ -2,6 +2,9 @@
 
 /* =========================================================
    DATA — 3 THÁNG
+   - BP104: 18 file
+   - BP105: 19 file
+   - BP106: 19 file
 ========================================================= */
 const BP104 = [
   'BP_Prize_104.png','BP_Task_FP_104.png','BP_104.png','BP_Window_PP_104.png',
@@ -31,7 +34,9 @@ const BP106 = [
 ];
 
 /* =========================================================
-   BUILD URLs
+   BUILD URLs — tự chọn domain theo tên file
+   - subtype7_*, BP_Premium_title_*, BP_GRANDPrize* → dl.dir.freefiremobile.com
+   - còn lại → dl-tata.freefireind.in
 ========================================================= */
 function buildUrl(bp, file) {
   const isDir = /^subtype7_|^BP_Premium_title_|^BP_GRANDPrize/.test(file);
@@ -82,7 +87,7 @@ function verifyImage(url) {
 }
 
 /* =========================================================
-   RENDER GRID
+   RENDER GRID — dùng chung cho cả 3 tháng
 ========================================================= */
 function renderGrid(gridEl, bp, files) {
   if (!gridEl) return;
@@ -126,6 +131,9 @@ function attachImageHandlers(container) {
   });
 }
 
+/* =========================================================
+   INIT — render 3 tháng giống hệt nhau
+========================================================= */
 renderGrid(document.getElementById('grid-t1'), 'BP104', BP104);
 renderGrid(document.getElementById('grid-t2'), 'BP105', BP105);
 renderGrid(document.getElementById('grid-t3'), 'BP106', BP106);
@@ -138,7 +146,7 @@ document.addEventListener('error', e => {
 }, true);
 
 /* =========================================================
-   TABS
+   TABS — chuyển đổi giữa 3 tháng
 ========================================================= */
 (function initTabs(){
   const tabs = document.querySelectorAll('.tab');
