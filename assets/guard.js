@@ -1,11 +1,12 @@
 /* =========================================================
-   GUARD — Bảo vệ web khỏi DevTools / Ctrl+U
+   GUARD — Bảo vệ web khỏi DevTools / Ctrl+U / Long-press
    Khi phát hiện → hiện overlay đếm ngược 4s → reload
 ========================================================= */
 (function () {
   'use strict';
 
-  const RELOAD_DELAY = 4; // giây
+  const RELOAD_DELAY = 4;      // giây
+  const LONG_PRESS_MS = 800;   // thời gian giữ màn hình để kích hoạt
 
   let triggered = false;
   let countdownTimer = null;
@@ -56,35 +57,22 @@
     const tag = (e.target && e.target.tagName || '').toLowerCase();
     const inField = tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable);
 
-    // F12
     if (e.key === 'F12' || e.keyCode === 123) {
       e.preventDefault(); e.stopPropagation();
-      triggerGuard();
-      return false;
+      triggerGuard(); return false;
     }
-
-    // Ctrl+Shift+I / J / C / K / E / M
     if (e.ctrlKey && e.shiftKey && ['i','j','c','k','e','m'].includes(k)) {
       e.preventDefault(); e.stopPropagation();
-      triggerGuard();
-      return false;
+      triggerGuard(); return false;
     }
-
-    // Mac: Cmd+Option+I / J / C
     if (e.metaKey && e.altKey && ['i','j','c'].includes(k)) {
       e.preventDefault(); e.stopPropagation();
-      triggerGuard();
-      return false;
+      triggerGuard(); return false;
     }
-
-    // Ctrl+U / Ctrl+S / Cmd+U / Cmd+S
     if ((e.ctrlKey || e.metaKey) && (k === 'u' || k === 's')) {
       e.preventDefault(); e.stopPropagation();
-      triggerGuard();
-      return false;
+      triggerGuard(); return false;
     }
-
-    // Ctrl+C / X / A (ngoài input)
     if ((e.ctrlKey || e.metaKey) && ['c','x','a'].includes(k) && !inField) {
       e.preventDefault();
     }
@@ -102,11 +90,106 @@
     }, { passive: false });
   });
 
-  /* ---------- 4) DETECT DEVTOOLS MỞ (DESKTOP) ---------- */
+  /* ---------- 4) LONG-PRESS (GIỮ MÀN HÌNH) ----------
+     - Chỉ giữ trên vùng nền (không phải button / link / img)
+     - Kích hoạt sau 800ms giữ yên
+     - Rung nhẹ (nếu hỗ trợ) để phản hồi
+  ------------------------------------------------ */
+  (function initLongPress() {
+    let pressTimer = null;
+    let startX = 0, startY = 0;
+    let isPressing = false;
+
+    const MOVE_TOLERANCE = 12; // px — di chuyển quá → huỷ
+    const LONG_PRESS_MS_LOCAL = LONG_PRESS_MS;
+
+    const isInteractive = (el) => {
+      if (!el) return false;
+      let node = el;
+      while (node && node !== document.body) {
+        const tag = (node.tagName || '').toLowerCase();
+        if (
+          tag === 'button' ||
+          tag === 'a' ||
+          tag === 'img' ||
+          tag === 'svg' ||
+          tag === 'input' ||
+          tag === 'textarea' ||
+          tag === 'select'
+        ) return true;
+        if (node.isContentEditable) return true;
+        if (node.classList && (
+          node.classList.contains('modal') ||
+          node.classList.contains('modal-inner') ||
+          node.classList.contains('toast') ||
+          node.classList.contains('tab')
+        )) return true;
+        node = node.parentElement;
+      }
+      return false;
+    };
+
+    const clear = () => {
+      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+      isPressing = false;
+    };
+
+    const start = (x, y, target) => {
+      if (isInteractive(target)) return;
+      clear();
+      isPressing = true;
+      startX = x; startY = y;
+
+      pressTimer = setTimeout(() => {
+        if (!isPressing) return;
+        isPressing = false;
+        // Rung nhẹ (mobile)
+        try { if (navigator.vibrate) navigator.vibrate([40, 30, 40]); } catch (e) {}
+        triggerGuard();
+      }, LONG_PRESS_MS_LOCAL);
+    };
+
+    const move = (x, y) => {
+      if (!isPressing) return;
+      const dx = Math.abs(x - startX);
+      const dy = Math.abs(y - startY);
+      if (dx > MOVE_TOLERANCE || dy > MOVE_TOLERANCE) clear();
+    };
+
+    /* --- Touch --- */
+    document.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) { clear(); return; }
+      const t = e.touches[0];
+      start(t.clientX, t.clientY, e.target);
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+      if (e.touches.length !== 1) { clear(); return; }
+      const t = e.touches[0];
+      move(t.clientX, t.clientY);
+    }, { passive: true });
+
+    document.addEventListener('touchend',     clear, { passive: true });
+    document.addEventListener('touchcancel',  clear, { passive: true });
+
+    /* --- Mouse (desktop) --- */
+    document.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      start(e.clientX, e.clientY, e.target);
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      move(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('mouseup',    clear);
+    document.addEventListener('mouseleave', clear);
+  })();
+
+  /* ---------- 5) DETECT DEVTOOLS MỞ (DESKTOP) ---------- */
   const isDesktop = window.matchMedia('(pointer:fine)').matches;
 
   if (isDesktop) {
-    // 4a) Window size delta
     setInterval(() => {
       if (triggered) return;
       const wDiff = window.outerWidth  - window.innerWidth;
@@ -114,7 +197,6 @@
       if (wDiff > 260 || hDiff > 260) triggerGuard();
     }, 1000);
 
-    // 4b) Debugger timing
     setInterval(() => {
       if (triggered) return;
       const t0 = performance.now();
@@ -124,7 +206,6 @@
       if (t1 - t0 > 200) triggerGuard();
     }, 2500);
 
-    // 4c) Console trap (dùng toString)
     try {
       const bait = /./;
       bait.toString = function () {
@@ -138,7 +219,6 @@
       }, 3000);
     } catch (e) { /* ignore */ }
 
-    // 4d) Object getter trap (devtools inspect sẽ gọi)
     try {
       const trap = {};
       Object.defineProperty(trap, 'id', {
@@ -155,7 +235,7 @@
     } catch (e) { /* ignore */ }
   }
 
-  /* ---------- 5) DỌN DẸP KHI RELOAD ---------- */
+  /* ---------- 6) DỌN DẸP KHI RELOAD ---------- */
   window.addEventListener('beforeunload', () => {
     if (countdownTimer) clearInterval(countdownTimer);
   });
