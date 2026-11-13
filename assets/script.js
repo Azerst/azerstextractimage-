@@ -216,9 +216,8 @@ const modalDl    = document.getElementById('modalDl');
 let currentUrl = '';
 let currentFilename = '';
 
-/* ---------- LOAD IMAGE → BLOB (không lộ link gốc) ---------- */
+/* ---------- LOAD IMAGE → BLOB ---------- */
 async function loadImageSafely(url, imgEl, mediaEl) {
-  // Thu hồi blob cũ nếu có
   if (imgEl.dataset.blobUrl) {
     try { URL.revokeObjectURL(imgEl.dataset.blobUrl); } catch (e) {}
     delete imgEl.dataset.blobUrl;
@@ -227,7 +226,6 @@ async function loadImageSafely(url, imgEl, mediaEl) {
   mediaEl.classList.remove('is-error');
   imgEl.onerror = () => mediaEl.classList.add('is-error');
 
-  // 1) Thử fetch → blob (URL thanh địa chỉ + img.src đều KHÔNG lộ link gốc)
   try {
     const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
     if (res.ok) {
@@ -238,14 +236,12 @@ async function loadImageSafely(url, imgEl, mediaEl) {
       imgEl.alt = 'AZERST';
       return;
     }
-    // Server trả lỗi (404/403) → hiện "Đang cập nhật"
     mediaEl.classList.add('is-error');
     return;
   } catch (err) {
-    // CORS chặn → fallback bên dưới
+    /* fallback */
   }
 
-  // 2) Fallback CORS: dùng link gốc — nhưng URL bar vẫn là #azer-image
   imgEl.src = url;
   imgEl.alt = 'AZERST';
 }
@@ -255,7 +251,6 @@ async function openModal(url, filename) {
   currentFilename = filename;
   modalMedia.classList.remove('is-error');
 
-  /* Đổi URL bar → #azer-image để không lộ link gốc */
   if (!history.state || !history.state.azerModal) {
     try { history.pushState({ azerModal: true }, '', '#azer-image'); } catch (e) {}
   }
@@ -264,7 +259,6 @@ async function openModal(url, filename) {
   modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 
-  /* Nếu ảnh grid đã biết lỗi → hiện pending luôn, không cần fetch */
   const media = findMediaByUrl(url);
   if (media && media.classList.contains('is-error')) {
     modalMedia.classList.add('is-error');
@@ -280,7 +274,6 @@ function closeModal() {
   modal.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
 
-  /* Dọn ảnh sau khi animation đóng xong */
   setTimeout(() => {
     if (modalImg.dataset.blobUrl) {
       try { URL.revokeObjectURL(modalImg.dataset.blobUrl); } catch (e) {}
@@ -290,13 +283,11 @@ function closeModal() {
     modalMedia.classList.remove('is-error');
   }, 350);
 
-  /* Trả URL về vị trí ban đầu */
   if (wasOpen && history.state && history.state.azerModal) {
     try { history.back(); } catch (e) {}
   }
 }
 
-/* ---------- Xử lý nút Back của trình duyệt ---------- */
 window.addEventListener('popstate', () => {
   if (modal.classList.contains('is-open')) {
     modal.classList.remove('is-open');
@@ -359,3 +350,18 @@ document.addEventListener('keydown', e => {
   e.preventDefault();
   openModal(media.dataset.url, media.dataset.filename);
 });
+
+/* =========================================================
+   THEME TOGGLE
+========================================================= */
+(function initThemeToggle(){
+  const html = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const cur = html.getAttribute('data-theme') || 'light';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('azer-theme', next); } catch (e) {}
+  });
+})();
