@@ -588,14 +588,18 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:700}
   margin-top:10px;
 }
 
-/* =========================================================
+/* ============================================================
    THEME TOGGLE — GÓC TRÁI-DƯỚI, CẮT 2 GÓC TRÁI
-========================================================= */
+   - Chỉ 1 button, không wrapper
+   - Không dùng filter
+   - Chỉ dùng inset box-shadow
+   - z-index tối đa
+   ============================================================ */
 .theme-toggle{
   position: fixed;
   bottom: 22px;
-  left: 16px;                    /* ← Góc TRÁI-dưới */
-  z-index: 9999;
+  left: 16px;
+  z-index: 2147483647;
 
   display: grid;
   place-items: center;
@@ -604,9 +608,9 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:700}
   padding: 0;
   margin: 0;
   border: none;
+  outline: none;
   cursor: pointer;
 
-  /* Nền đỏ đậm — luôn tương phản */
   background: linear-gradient(135deg,
     #ff7a5c 0%,
     #ff5a46 30%,
@@ -614,7 +618,6 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:700}
     #b52a1c 100%);
   color: #ffffff;
 
-  /* Cắt 2 góc TRÁI (trên + dưới) */
   clip-path: polygon(
     14px 0,
     100% 0,
@@ -624,23 +627,23 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:700}
     0 14px
   );
 
-  /* Inset shadows — đi theo clip-path, tạo viền + khối */
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.35),
-    inset 0 4px 8px rgba(255, 255, 255, 0.18),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.22);
+    inset 0 0 0 2px rgba(255, 255, 255, 0.4),
+    inset 0 4px 10px rgba(255, 255, 255, 0.25),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.3);
 
   transition: transform .25s cubic-bezier(.2,.8,.2,1);
   -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .theme-toggle:hover{ transform: scale(1.08); }
 .theme-toggle:active{ transform: scale(.94); }
-.theme-toggle:focus{ outline: none; }
 .theme-toggle:focus-visible{
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.9),
-    inset 0 4px 8px rgba(255, 255, 255, 0.18),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.22);
+    inset 0 0 0 2px rgba(255, 255, 255, 0.95),
+    inset 0 4px 10px rgba(255, 255, 255, 0.25),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .theme-toggle svg{
@@ -652,14 +655,12 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:700}
   stroke-linecap: round;
   stroke-linejoin: round;
   pointer-events: none;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
   transition: transform .3s ease;
 }
 .theme-toggle:hover svg{ transform: rotate(15deg); }
 
 .theme-toggle .icon-sun{ display: none; }
 
-/* Dark mode: đổi nền tối + icon vàng */
 html[data-theme="dark"] .theme-toggle{
   background: linear-gradient(135deg,
     #64748b 0%,
@@ -668,16 +669,14 @@ html[data-theme="dark"] .theme-toggle{
     #0f172a 100%);
   color: #fbbf24;
   box-shadow:
-    inset 0 0 0 2px rgba(251, 191, 36, 0.4),
-    inset 0 4px 8px rgba(255, 255, 255, 0.08),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.4);
+    inset 0 0 0 2px rgba(251, 191, 36, 0.45),
+    inset 0 4px 10px rgba(255, 255, 255, 0.1),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.5);
 }
 html[data-theme="dark"] .theme-toggle .icon-moon{ display: none; }
 html[data-theme="dark"] .theme-toggle .icon-sun{ display: block; }
 
-/* =========================================================
-   DARK THEME
-========================================================= */
+/* ============ DARK THEME ============ */
 html[data-theme="dark"]{
   --ink:#f1f5f9;
   --ink-2:#cbd5e1;
