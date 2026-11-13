@@ -589,15 +589,12 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:700}
 }
 
 /* =========================================================
-   THEME TOGGLE — BULLETPROOF
-   Chỉ 1 thẻ button. Không wrapper, không filter.
-   Đỏ đậm gradient — không thể tàng hình.
-   Cắt 2 góc trái 14px.
+   THEME TOGGLE — GÓC TRÁI-DƯỚI, CẮT 2 GÓC TRÁI
 ========================================================= */
 .theme-toggle{
   position: fixed;
   bottom: 22px;
-  right: 16px;
+  left: 16px;                    /* ← Góc TRÁI-dưới */
   z-index: 9999;
 
   display: grid;
@@ -814,7 +811,15 @@ html[data-theme="dark"] .modal-inner{
     width: 50px;
     height: 50px;
     bottom: 18px;
-    right: 12px;
+    left: 12px;
+    clip-path: polygon(
+      12px 0,
+      100% 0,
+      100% 100%,
+      12px 100%,
+      0 calc(100% - 12px),
+      0 12px
+    );
   }
   .theme-toggle svg{ width: 21px; height: 21px; }
 }
