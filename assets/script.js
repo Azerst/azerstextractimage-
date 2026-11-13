@@ -350,18 +350,3 @@ document.addEventListener('keydown', e => {
   e.preventDefault();
   openModal(media.dataset.url, media.dataset.filename);
 });
-
-/* =========================================================
-   THEME TOGGLE
-========================================================= */
-(function initThemeToggle(){
-  const html = document.documentElement;
-  const btn = document.getElementById('themeToggle');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    const cur = html.getAttribute('data-theme') || 'light';
-    const next = cur === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    try { localStorage.setItem('azer-theme', next); } catch (e) {}
-  });
-})();
