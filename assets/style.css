@@ -589,95 +589,94 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:700}
 }
 
 /* =========================================================
-   THEME TOGGLE — HÌNH VUÔNG CẮT 2 GÓC TRÁI (TRÊN + DƯỚI)
-   Wrapper ngoài = drop-shadow (shadow theo đúng hình đã clip)
-   Button trong = clip-path
+   THEME TOGGLE — BULLETPROOF
+   Chỉ 1 thẻ button. Không wrapper, không filter.
+   Đỏ đậm gradient — không thể tàng hình.
+   Cắt 2 góc trái 14px.
 ========================================================= */
-.theme-toggle-wrap{
-  position:fixed;
-  bottom:22px;
-  right:18px;
-  z-index:9999;
-  display:block;
-  filter:drop-shadow(0 8px 20px rgba(217,56,40,.55));
-  transition:filter .3s ease;
-  pointer-events:auto;
-}
-.theme-toggle-wrap:hover{
-  filter:drop-shadow(0 12px 28px rgba(217,56,40,.75));
-}
-
 .theme-toggle{
-  --cut: 14px;
-  position:relative;
-  display:grid;
-  place-items:center;
-  width: 54px;
-  height: 54px;
-  border: none;
+  position: fixed;
+  bottom: 22px;
+  right: 16px;
+  z-index: 9999;
+
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
   padding: 0;
   margin: 0;
+  border: none;
   cursor: pointer;
 
-  /* Nền ĐỎ ĐẬM gradient — luôn tương phản cả 2 theme */
-  background: linear-gradient(135deg, #ff7a5c 0%, #ff5a46 25%, #d93828 55%, #b52a1c 100%);
+  /* Nền đỏ đậm — luôn tương phản */
+  background: linear-gradient(135deg,
+    #ff7a5c 0%,
+    #ff5a46 30%,
+    #d93828 65%,
+    #b52a1c 100%);
   color: #ffffff;
 
-  /* Cắt 2 góc TRÁI */
+  /* Cắt 2 góc TRÁI (trên + dưới) */
   clip-path: polygon(
-    var(--cut) 0,
+    14px 0,
     100% 0,
     100% 100%,
-    var(--cut) 100%,
-    0 calc(100% - var(--cut)),
-    0 var(--cut)
+    14px 100%,
+    0 calc(100% - 14px),
+    0 14px
   );
 
-  /* Viền sáng bên trong — theo đúng clip-path */
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.28);
+  /* Inset shadows — đi theo clip-path, tạo viền + khối */
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.35),
+    inset 0 4px 8px rgba(255, 255, 255, 0.18),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.22);
 
-  transition: transform .25s cubic-bezier(.2,.8,.2,1), background .3s ease;
+  transition: transform .25s cubic-bezier(.2,.8,.2,1);
+  -webkit-tap-highlight-color: transparent;
 }
-.theme-toggle:hover{
-  transform: scale(1.08);
-}
-.theme-toggle:active{
-  transform: scale(.94);
-}
+.theme-toggle:hover{ transform: scale(1.08); }
+.theme-toggle:active{ transform: scale(.94); }
+.theme-toggle:focus{ outline: none; }
 .theme-toggle:focus-visible{
-  outline: none;
-  box-shadow: inset 0 0 0 2px rgba(255,255,255,.9);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.9),
+    inset 0 4px 8px rgba(255, 255, 255, 0.18),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.22);
 }
 
 .theme-toggle svg{
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
   pointer-events: none;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,.3));
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
   transition: transform .3s ease;
 }
 .theme-toggle:hover svg{ transform: rotate(15deg); }
-.theme-toggle .icon-sun{ display:none; }
 
-/* --- Dark mode: đổi sang nền tối + icon vàng --- */
-html[data-theme="dark"] .theme-toggle-wrap{
-  filter: drop-shadow(0 8px 20px rgba(0,0,0,.7));
-}
-html[data-theme="dark"] .theme-toggle-wrap:hover{
-  filter: drop-shadow(0 12px 28px rgba(251,191,36,.45));
-}
+.theme-toggle .icon-sun{ display: none; }
+
+/* Dark mode: đổi nền tối + icon vàng */
 html[data-theme="dark"] .theme-toggle{
-  background: linear-gradient(135deg, #475569 0%, #334155 25%, #1e293b 55%, #0f172a 100%);
+  background: linear-gradient(135deg,
+    #64748b 0%,
+    #475569 30%,
+    #1e293b 65%,
+    #0f172a 100%);
   color: #fbbf24;
-  box-shadow: inset 0 0 0 2px rgba(251, 191, 36, 0.35);
+  box-shadow:
+    inset 0 0 0 2px rgba(251, 191, 36, 0.4),
+    inset 0 4px 8px rgba(255, 255, 255, 0.08),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.4);
 }
-html[data-theme="dark"] .theme-toggle .icon-moon{ display:none; }
-html[data-theme="dark"] .theme-toggle .icon-sun{ display:block; }
+html[data-theme="dark"] .theme-toggle .icon-moon{ display: none; }
+html[data-theme="dark"] .theme-toggle .icon-sun{ display: block; }
 
 /* =========================================================
    DARK THEME
@@ -811,23 +810,13 @@ html[data-theme="dark"] .modal-inner{
 
   .page-footer .copy{font-size:9px; letter-spacing:1.4px}
 
-  .theme-toggle-wrap{
-    bottom:18px;
-    right:14px;
-    filter:drop-shadow(0 6px 16px rgba(217,56,40,.6));
-  }
-  .theme-toggle-wrap:hover{
-    filter:drop-shadow(0 10px 22px rgba(217,56,40,.8));
-  }
   .theme-toggle{
-    --cut: 12px;
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
+    bottom: 18px;
+    right: 12px;
   }
-  .theme-toggle svg{ width:20px; height:20px; }
-  html[data-theme="dark"] .theme-toggle-wrap{
-    filter:drop-shadow(0 6px 16px rgba(0,0,0,.75));
-  }
+  .theme-toggle svg{ width: 21px; height: 21px; }
 }
 
 @media (max-width:360px){
