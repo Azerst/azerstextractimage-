@@ -25,6 +25,7 @@
       <p class="hero-sub">BOOYAH PASS GALLERY</p>
     </header>
 
+    <!-- TABS -->
     <div class="tabs" role="tablist" aria-label="Chọn Booyah Pass">
       <button class="tab is-active" data-tab="t1" role="tab" aria-selected="true" aria-controls="panel-t1" type="button">
         <span class="tab-prefix">BOOYAH</span>
@@ -40,6 +41,7 @@
       </button>
     </div>
 
+    <!-- PANEL T1 -->
     <section class="panel is-active" id="panel-t1" role="tabpanel">
       <header class="panel-title">
         <h2>
@@ -48,13 +50,9 @@
         </h2>
       </header>
       <div class="grid" id="grid-t1"></div>
-      <div class="panel-empty" id="empty-t1" aria-hidden="true">
-        <div class="panel-empty-icon">!</div>
-        <p class="panel-empty-title">Đang cập nhật</p>
-        <p class="panel-empty-desc">Thẻ Booyah Tháng 1 sẽ sớm có mặt</p>
-      </div>
     </section>
 
+    <!-- PANEL T2 -->
     <section class="panel" id="panel-t2" role="tabpanel">
       <header class="panel-title">
         <h2>
@@ -63,13 +61,9 @@
         </h2>
       </header>
       <div class="grid" id="grid-t2"></div>
-      <div class="panel-empty" id="empty-t2" aria-hidden="true">
-        <div class="panel-empty-icon">!</div>
-        <p class="panel-empty-title">Đang cập nhật</p>
-        <p class="panel-empty-desc">Thẻ Booyah Tháng 2 sẽ sớm có mặt</p>
-      </div>
     </section>
 
+    <!-- PANEL T3 -->
     <section class="panel" id="panel-t3" role="tabpanel">
       <header class="panel-title">
         <h2>
@@ -78,19 +72,16 @@
         </h2>
       </header>
       <div class="grid" id="grid-t3"></div>
-      <div class="panel-empty" id="empty-t3" aria-hidden="true">
-        <div class="panel-empty-icon">!</div>
-        <p class="panel-empty-title">Đang cập nhật</p>
-        <p class="panel-empty-desc">Thẻ Booyah Tháng 3 sẽ sớm có mặt</p>
-      </div>
     </section>
 
+    <!-- FOOTER -->
     <footer class="page-footer">
       <p class="copy">© 2026 <strong>AZERST</strong> — ALL RIGHTS RESERVED</p>
     </footer>
 
   </main>
 
+  <!-- MODAL -->
   <div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-inner">
       <button class="modal-close" id="modalClose" type="button" aria-label="Đóng">
@@ -112,8 +103,10 @@
     </div>
   </div>
 
+  <!-- TOAST -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <!-- GUARD OVERLAY -->
   <div class="guard-overlay" id="guardOverlay" role="alertdialog" aria-modal="true" aria-hidden="true">
     <div class="guard-card">
       <div class="guard-icon">!</div>
