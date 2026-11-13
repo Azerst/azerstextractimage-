@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Booyah Pass — BP104 &amp; BP105</title>
+<title>AZERST — Booyah Pass</title>
 
 <link rel="preload" as="font" type="font/woff2" crossorigin
       href="https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Bold.woff2">
@@ -59,14 +59,6 @@
     min-height:100dvh;
     width:100%;
     background-color:var(--bg-main);
-    background-image:
-      radial-gradient(ellipse 60% 40% at 20% 0%, rgba(217,56,40,.08) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(255,122,92,.08) 0%, transparent 60%),
-      linear-gradient(var(--grid-color) 1px,transparent 1px),
-      linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);
-    background-size:auto, auto, 32px 32px, 32px 32px;
-    background-position:center top;
-    background-attachment:fixed;
     overflow-x:hidden;
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
@@ -77,6 +69,70 @@
     user-select:none;
     -webkit-touch-callout:none;
     -webkit-tap-highlight-color:transparent;
+    position:relative;
+  }
+
+  /* ============ BACKGROUND RED GLOW ============ */
+  .bg-glow{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+    background-image:
+      linear-gradient(var(--grid-color) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);
+    background-size:32px 32px;
+    background-position:center top;
+  }
+  .bg-glow::before,
+  .bg-glow::after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    filter:blur(80px);
+    will-change:transform,opacity;
+  }
+  .bg-glow::before{
+    width:min(70vw,700px);
+    height:min(70vw,700px);
+    top:-10%;
+    left:-15%;
+    background:radial-gradient(circle, rgba(255,90,70,.42) 0%, rgba(217,56,40,.24) 40%, transparent 70%);
+    animation:glowDrift1 30s ease-in-out infinite alternate;
+  }
+  .bg-glow::after{
+    width:min(65vw,650px);
+    height:min(65vw,650px);
+    bottom:-15%;
+    right:-15%;
+    background:radial-gradient(circle, rgba(255,122,92,.36) 0%, rgba(181,42,28,.22) 45%, transparent 72%);
+    animation:glowDrift2 36s ease-in-out infinite alternate;
+  }
+  .bg-glow .g3{
+    position:absolute;
+    width:min(45vw,460px);
+    height:min(45vw,460px);
+    top:38%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    filter:blur(90px);
+    background:radial-gradient(circle, rgba(255,140,110,.24) 0%, transparent 68%);
+    animation:glowPulse 24s ease-in-out infinite;
+    will-change:transform,opacity;
+  }
+  @keyframes glowDrift1{
+    0%{transform:translate(0,0) scale(1);opacity:.85}
+    100%{transform:translate(18vw,12vh) scale(1.15);opacity:1}
+  }
+  @keyframes glowDrift2{
+    0%{transform:translate(0,0) scale(1.1);opacity:.9}
+    100%{transform:translate(-16vw,-10vh) scale(.95);opacity:.7}
+  }
+  @keyframes glowPulse{
+    0%,100%{transform:translate(-50%,-50%) scale(.85);opacity:.5}
+    50%{transform:translate(-50%,-50%) scale(1.15);opacity:.85}
   }
 
   img,svg{-webkit-user-drag:none}
@@ -90,74 +146,94 @@
     z-index:1;
     max-width:900px;
     margin:0 auto;
-    padding:clamp(20px,4vh,44px) 16px 60px;
+    padding:clamp(28px,5vh,54px) 16px 60px;
     display:flex;
     flex-direction:column;
     gap:22px;
   }
 
-  /* ============ HEADER BRAND ============ */
-  .brand{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:14px;
-    padding:4px 0 6px;
-    animation:brandIn .6s cubic-bezier(.2,.8,.2,1) both;
+  /* ============ HERO TITLE AZERST ============ */
+  .hero{
+    position:relative;
+    text-align:center;
+    padding:6px 0 2px;
+    animation:heroIn .8s cubic-bezier(.2,.8,.2,1) both;
   }
-  @keyframes brandIn{
-    from{opacity:0;transform:translateY(-8px)}
+  @keyframes heroIn{
+    from{opacity:0;transform:translateY(-14px)}
     to{opacity:1;transform:translateY(0)}
   }
-  .brand-mark{
-    display:grid;
-    place-items:center;
-    width:44px;
-    height:44px;
-    border-radius:12px;
-    background:linear-gradient(135deg,#ff5a46 0%, var(--red) 50%, var(--red-dark) 100%);
-    color:#fff;
-    font-family:var(--font-black);
-    font-weight:900;
-    font-size:17px;
-    letter-spacing:-.5px;
-    box-shadow:
-      0 1px 0 rgba(255,255,255,.4) inset,
-      0 10px 24px -10px rgba(217,56,40,.6);
-    position:relative;
-    overflow:hidden;
-  }
-  .brand-mark::before{
+  .hero::before{
     content:"";
     position:absolute;
-    inset:-50%;
-    background:conic-gradient(from 0deg, transparent, rgba(255,255,255,.4), transparent 30%);
-    animation:brandSpin 6s linear infinite;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:min(80%,480px);
+    height:120px;
+    background:radial-gradient(ellipse, rgba(255,90,70,.28) 0%, transparent 70%);
+    filter:blur(30px);
+    z-index:-1;
+    pointer-events:none;
+    animation:heroGlow 9s ease-in-out infinite alternate;
   }
-  @keyframes brandSpin{to{transform:rotate(360deg)}}
-  .brand-mark span{position:relative;z-index:1}
+  @keyframes heroGlow{
+    0%{opacity:.55;transform:translate(-50%,-50%) scale(.92)}
+    100%{opacity:.95;transform:translate(-50%,-50%) scale(1.06)}
+  }
 
-  .brand-text{
-    display:flex;
-    flex-direction:column;
-    gap:2px;
-  }
-  .brand-name{
+  .hero-title{
     font-family:var(--font-black);
     font-weight:900;
-    font-size:16px;
-    letter-spacing:3px;
-    color:var(--ink);
+    font-size:clamp(42px, 12vw, 82px);
+    letter-spacing:clamp(4px, 1.4vw, 10px);
     line-height:1;
+    background-image:linear-gradient(
+      120deg,
+      var(--red-dark) 0%,
+      var(--red) 18%,
+      var(--red-light) 34%,
+      #ffffff 50%,
+      var(--red-light) 66%,
+      var(--red) 82%,
+      var(--red-dark) 100%
+    );
+    background-size:220% 100%;
+    background-position:0% 0%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+    animation:heroShine 18s ease-in-out infinite;
+    filter:drop-shadow(0 4px 14px rgba(217,56,40,.35));
+    padding:0 4px;
+    margin-bottom:8px;
   }
-  .brand-sub{
+  @keyframes heroShine{
+    0%,100%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+  }
+  .hero-sub{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
     font-family:var(--font-heading);
     font-weight:700;
-    font-size:9.5px;
-    letter-spacing:2.5px;
+    font-size:clamp(9.5px, 2.6vw, 11.5px);
+    letter-spacing:clamp(2px, .8vw, 3.5px);
     color:var(--red);
     text-transform:uppercase;
-    line-height:1;
+  }
+  .hero-sub::before,
+  .hero-sub::after{
+    content:"";
+    width:22px;
+    height:2px;
+    border-radius:2px;
+    background:linear-gradient(90deg,transparent,var(--red));
+  }
+  .hero-sub::after{
+    background:linear-gradient(90deg,var(--red),transparent);
   }
 
   /* ============ TABS ============ */
@@ -180,17 +256,15 @@
   }
   .tab{
     display:flex;
-    align-items:center;
+    align-items:baseline;
     justify-content:center;
-    gap:9px;
-    padding:13px 12px;
+    gap:8px;
+    padding:14px 12px;
     border:1px solid transparent;
     background:transparent;
     border-radius:13px;
     font-family:var(--font-heading);
     font-weight:700;
-    font-size:12px;
-    letter-spacing:1.4px;
     color:var(--ink-2);
     cursor:pointer;
     transition:background .3s, color .3s, border-color .3s, box-shadow .3s, transform .2s;
@@ -207,18 +281,35 @@
       0 1px 0 rgba(255,255,255,.35) inset,
       0 10px 24px -10px rgba(217,56,40,.65);
   }
-  .tab-num{
-    display:inline-grid;place-items:center;
-    min-width:27px;height:27px;padding:0 8px;
-    border-radius:8px;
-    font-family:var(--font-black);font-weight:900;
-    font-size:11px;line-height:1;
-    background:rgba(15,23,42,.08);
-    color:inherit;
-    transition:background .3s;
+  .tab-prefix{
+    font-size:11px;
+    letter-spacing:1.6px;
+    opacity:.75;
   }
-  .tab.is-active .tab-num{background:rgba(255,255,255,.3)}
-  .tab-text{white-space:nowrap}
+  .tab.is-active .tab-prefix{opacity:.9}
+  .tab-month{
+    font-family:var(--font-black);
+    font-weight:900;
+    font-size:16px;
+    letter-spacing:1.5px;
+    line-height:1;
+    background-image:linear-gradient(135deg, var(--red-dark), var(--red-light), var(--red-dark));
+    background-size:200% 100%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+    animation:monthShimmer 10s ease-in-out infinite;
+    filter:drop-shadow(0 1px 3px rgba(217,56,40,.25));
+  }
+  .tab.is-active .tab-month{
+    background-image:linear-gradient(135deg,#fff 0%, #ffe0d8 50%, #fff 100%);
+    filter:drop-shadow(0 1px 4px rgba(0,0,0,.15));
+  }
+  @keyframes monthShimmer{
+    0%,100%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+  }
 
   /* ============ PANEL ============ */
   .panel{display:none}
@@ -238,7 +329,7 @@
     justify-content:center;
     gap:14px;
     margin-bottom:16px;
-    padding:16px 20px;
+    padding:18px 20px;
     background:
       linear-gradient(180deg,rgba(255,255,255,.4) 0%,rgba(255,255,255,.22) 100%);
     -webkit-backdrop-filter:blur(24px) saturate(180%);
@@ -257,7 +348,7 @@
     top:0;left:0;right:0;height:3px;
     background:linear-gradient(90deg, var(--red-dark), var(--red), var(--red-light), var(--red), var(--red-dark));
     background-size:200% 100%;
-    animation:titleSweep 4s ease-in-out infinite;
+    animation:titleSweep 9s ease-in-out infinite;
   }
   @keyframes titleSweep{
     0%,100%{background-position:0% 0%}
@@ -270,30 +361,50 @@
     background:linear-gradient(90deg,transparent,rgba(255,255,255,.95),transparent);
   }
   .panel-title h2{
+    display:flex;
+    align-items:baseline;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
     font-family:var(--font-black);
     font-weight:900;
-    font-size:16px;
-    letter-spacing:2.5px;
+    font-size:17px;
+    letter-spacing:2.2px;
     color:var(--ink);
     text-transform:uppercase;
     text-align:center;
-    line-height:1.2;
+    line-height:1.15;
   }
-  .title-badge{
-    display:grid;
-    place-items:center;
-    min-width:48px;
-    height:34px;
-    padding:0 11px;
-    font-family:var(--font-black);
-    font-weight:900;
-    font-size:14px;
-    letter-spacing:.5px;
-    color:#fff;
-    background:linear-gradient(135deg,#ff5a46 0%, var(--red) 50%, var(--red-dark) 100%);
-    clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
-    box-shadow:0 5px 14px -5px rgba(217,56,40,.6);
-    flex:0 0 auto;
+  .title-prefix{
+    color:var(--ink);
+    letter-spacing:2.2px;
+  }
+  .title-month{
+    font-size:1.45em;
+    letter-spacing:1.6px;
+    line-height:1;
+    background-image:linear-gradient(
+      120deg,
+      var(--red-dark) 0%,
+      var(--red) 22%,
+      var(--red-light) 40%,
+      #ffffff 50%,
+      var(--red-light) 60%,
+      var(--red) 78%,
+      var(--red-dark) 100%
+    );
+    background-size:220% 100%;
+    background-position:0% 50%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+    animation:monthHero 14s ease-in-out infinite;
+    filter:drop-shadow(0 2px 8px rgba(217,56,40,.35));
+  }
+  @keyframes monthHero{
+    0%,100%{background-position:0% 50%}
+    50%{background-position:100% 50%}
   }
 
   /* ============ GRID ============ */
@@ -465,9 +576,9 @@
     display:grid;
     place-items:center;
     padding:16px;
-    background:rgba(15,23,42,.72);
-    -webkit-backdrop-filter:blur(14px) saturate(140%);
-    backdrop-filter:blur(14px) saturate(140%);
+    background:rgba(15,23,42,.75);
+    -webkit-backdrop-filter:blur(16px) saturate(140%);
+    backdrop-filter:blur(16px) saturate(140%);
     opacity:0;
     visibility:hidden;
     pointer-events:none;
@@ -503,6 +614,37 @@
     transform:scale(1) translateY(0);
   }
 
+  /* Modal brand AZERST */
+  .modal-brand{
+    text-align:center;
+    padding:2px 0 4px;
+  }
+  .modal-brand-name{
+    font-family:var(--font-black);
+    font-weight:900;
+    font-size:clamp(20px, 5vw, 26px);
+    letter-spacing:6px;
+    line-height:1;
+    background-image:linear-gradient(
+      120deg,
+      var(--red-dark) 0%,
+      var(--red) 20%,
+      var(--red-light) 35%,
+      #ffffff 50%,
+      var(--red-light) 65%,
+      var(--red) 80%,
+      var(--red-dark) 100%
+    );
+    background-size:220% 100%;
+    background-position:0% 0%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+    animation:heroShine 18s ease-in-out infinite;
+    filter:drop-shadow(0 2px 8px rgba(217,56,40,.5));
+  }
+
   .modal-media{
     position:relative;
     display:grid;
@@ -513,12 +655,12 @@
       repeating-conic-gradient(rgba(255,255,255,.06) 0% 25%,transparent 0% 50%) 50% / 16px 16px,
       rgba(0,0,0,.3);
     border:1px solid rgba(255,255,255,.15);
-    max-height:72vh;
+    max-height:66vh;
   }
   .modal-media img{
     display:block;
     max-width:100%;
-    max-height:72vh;
+    max-height:66vh;
     object-fit:contain;
     padding:10px;
   }
@@ -576,43 +718,30 @@
     stroke-linejoin:round;
   }
 
-  /* Modal footer */
+  /* Modal footer — centered download */
   .modal-footer{
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    gap:12px;
+    justify-content:center;
     padding:0 4px;
-  }
-  .modal-file{
-    font-family:var(--font-body);
-    font-weight:600;
-    font-size:11px;
-    letter-spacing:.5px;
-    color:rgba(255,255,255,.85);
-    min-width:0;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
   }
   .modal-dl{
     display:inline-flex;
     align-items:center;
-    gap:6px;
-    padding:9px 16px;
+    gap:7px;
+    padding:11px 22px;
     border:none;
-    border-radius:9px;
+    border-radius:10px;
     font-family:var(--font-heading);
     font-weight:700;
-    font-size:11px;
-    letter-spacing:1.4px;
+    font-size:11.5px;
+    letter-spacing:1.6px;
     text-transform:uppercase;
     color:#fff;
     background:linear-gradient(135deg, #ff5a46 0%, var(--red) 50%, var(--red-dark) 100%);
-    box-shadow:0 5px 14px -5px rgba(217,56,40,.6);
+    box-shadow:0 5px 16px -5px rgba(217,56,40,.65);
     cursor:pointer;
     transition:transform .2s, filter .2s, box-shadow .2s;
-    flex:0 0 auto;
     position:relative;
     overflow:hidden;
   }
@@ -628,7 +757,7 @@
   .modal-dl:hover{
     transform:translateY(-1px);
     filter:brightness(1.08);
-    box-shadow:0 10px 22px -8px rgba(217,56,40,.75);
+    box-shadow:0 10px 24px -8px rgba(217,56,40,.8);
   }
   .modal-dl.is-loading{pointer-events:none;opacity:.75}
   .modal-dl svg{
@@ -643,9 +772,9 @@
 
   /* ============ FOOTER ============ */
   .page-footer{
-    padding:18px 18px 0;
+    padding:20px 18px 0;
     text-align:center;
-    margin-top:10px;
+    margin-top:12px;
     position:relative;
   }
   .page-footer::before{
@@ -654,51 +783,42 @@
     top:0;
     left:50%;
     transform:translateX(-50%);
-    width:56px;
+    width:64px;
     height:2px;
     background:linear-gradient(90deg, transparent, var(--red), transparent);
     border-radius:2px;
-  }
-  .page-footer .note{
-    font-family:var(--font-heading);
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:2.2px;
-    color:var(--ink-2);
-    text-transform:uppercase;
-    margin-bottom:4px;
   }
   .page-footer .copy{
     font-family:var(--font-body);
     font-size:10px;
     font-weight:500;
-    letter-spacing:1.4px;
+    letter-spacing:1.8px;
     color:var(--ink-3);
     text-transform:uppercase;
+    line-height:1.6;
   }
   .page-footer .copy strong{
     font-family:var(--font-black);
     font-weight:900;
     color:var(--red);
-    letter-spacing:1.8px;
+    letter-spacing:2px;
   }
 
   /* ============ RESPONSIVE ============ */
   @media (max-width:520px){
-    .page{padding:14px 12px 46px;gap:16px}
+    .page{padding:22px 12px 46px;gap:18px}
 
-    .brand{gap:11px}
-    .brand-mark{width:38px;height:38px;font-size:15px;border-radius:10px}
-    .brand-name{font-size:14px;letter-spacing:2.4px}
-    .brand-sub{font-size:8.5px;letter-spacing:2px}
+    .hero-title{font-size:clamp(40px, 14vw, 60px);letter-spacing:clamp(4px, 1.6vw, 7px)}
 
     .tabs{top:8px;padding:5px;border-radius:15px;gap:5px}
-    .tab{padding:11px 8px;font-size:11px;letter-spacing:1.1px;gap:7px;border-radius:11px}
-    .tab-num{min-width:23px;height:23px;font-size:10px;padding:0 6px;border-radius:7px}
+    .tab{padding:12px 8px;gap:6px;border-radius:11px}
+    .tab-prefix{font-size:9.5px;letter-spacing:1.3px}
+    .tab-month{font-size:14px;letter-spacing:1.2px}
 
-    .panel-title{padding:13px 14px;gap:10px;margin-bottom:13px;border-radius:14px}
-    .panel-title h2{font-size:13.5px;letter-spacing:1.8px}
-    .title-badge{min-width:40px;height:28px;font-size:12px;padding:0 8px}
+    .panel-title{padding:14px 12px;margin-bottom:13px;border-radius:14px}
+    .panel-title h2{font-size:14px;letter-spacing:1.5px;gap:8px}
+    .title-prefix{letter-spacing:1.5px}
+    .title-month{font-size:1.55em;letter-spacing:1.2px}
 
     .grid{grid-template-columns:repeat(2, minmax(0,1fr));gap:10px}
     .item{padding:9px;gap:7px;border-radius:13px}
@@ -711,13 +831,13 @@
     .modal-inner{padding:10px;border-radius:16px;gap:10px;max-width:100%}
     .modal-close{top:-8px;right:-8px;width:34px;height:34px}
     .modal-close svg{width:15px;height:15px}
-    .modal-media img{padding:6px;max-height:66vh}
-    .modal-file{font-size:10px}
-    .modal-dl{padding:8px 12px;font-size:10px;letter-spacing:1.2px}
-    .modal-dl svg{width:11px;height:11px}
+    .modal-brand-name{font-size:20px;letter-spacing:4px}
+    .modal-media img{padding:6px;max-height:60vh}
+    .modal-media{max-height:60vh}
+    .modal-dl{padding:10px 18px;font-size:10.5px;letter-spacing:1.3px}
+    .modal-dl svg{width:12px;height:12px}
 
-    .page-footer .note{font-size:10px;letter-spacing:1.8px}
-    .page-footer .copy{font-size:9px;letter-spacing:1.2px}
+    .page-footer .copy{font-size:9px;letter-spacing:1.4px}
   }
 
   @media (max-width:360px){
@@ -726,40 +846,57 @@
 
   @media (prefers-reduced-motion:reduce){
     *{animation:none !important;transition:none !important}
+    .hero-title, .modal-brand-name{
+      -webkit-text-fill-color:var(--red);
+      color:var(--red);
+      background:none;
+    }
+    .title-month{
+      -webkit-text-fill-color:var(--red);
+      color:var(--red);
+      background:none;
+    }
+    .tab-month{
+      -webkit-text-fill-color:var(--red);
+      color:var(--red);
+      background:none;
+    }
   }
 </style>
 </head>
 
 <body>
 
+  <!-- BACKGROUND GLOW -->
+  <div class="bg-glow" aria-hidden="true"><span class="g3"></span></div>
+
   <main class="page">
 
-    <!-- BRAND -->
-    <header class="brand">
-      <div class="brand-mark"><span>BP</span></div>
-      <div class="brand-text">
-        <span class="brand-name">BOOYAH PASS</span>
-        <span class="brand-sub">Links &amp; Images Gallery</span>
-      </div>
+    <!-- HERO AZERST -->
+    <header class="hero">
+      <h1 class="hero-title">AZERST</h1>
+      <p class="hero-sub">BOOYAH PASS GALLERY</p>
     </header>
 
     <!-- TABS -->
     <div class="tabs" role="tablist" aria-label="Chọn Booyah Pass">
       <button class="tab is-active" data-tab="t1" role="tab" aria-selected="true" aria-controls="panel-t1" type="button">
-        <span class="tab-num">104</span>
-        <span class="tab-text">BOOYAH T1</span>
+        <span class="tab-prefix">BOOYAH</span>
+        <span class="tab-month">THÁNG 1</span>
       </button>
       <button class="tab" data-tab="t2" role="tab" aria-selected="false" aria-controls="panel-t2" type="button">
-        <span class="tab-num">105</span>
-        <span class="tab-text">BOOYAH T2</span>
+        <span class="tab-prefix">BOOYAH</span>
+        <span class="tab-month">THÁNG 2</span>
       </button>
     </div>
 
     <!-- PANEL T1 -->
     <section class="panel is-active" id="panel-t1" role="tabpanel">
       <header class="panel-title">
-        <span class="title-badge">104</span>
-        <h2>THẺ BOOYAH THÁNG 1</h2>
+        <h2>
+          <span class="title-prefix">THẺ BOOYAH</span>
+          <span class="title-month">THÁNG 1</span>
+        </h2>
       </header>
       <div class="grid" id="grid-t1"></div>
     </section>
@@ -767,34 +904,37 @@
     <!-- PANEL T2 -->
     <section class="panel" id="panel-t2" role="tabpanel">
       <header class="panel-title">
-        <span class="title-badge">105</span>
-        <h2>THẺ BOOYAH THÁNG 2</h2>
+        <h2>
+          <span class="title-prefix">THẺ BOOYAH</span>
+          <span class="title-month">THÁNG 2</span>
+        </h2>
       </header>
       <div class="grid" id="grid-t2"></div>
     </section>
 
     <!-- FOOTER -->
     <footer class="page-footer">
-      <p class="note">BOOYAH PASS</p>
-      <p class="copy">© 2026 <strong>AZERST</strong></p>
+      <p class="copy">© 2026 <strong>AZERST</strong> — ALL RIGHTS RESERVED</p>
     </footer>
 
   </main>
 
   <!-- ============ MODAL ============ -->
-  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalFile" aria-hidden="true">
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-inner">
       <button class="modal-close" id="modalClose" type="button" aria-label="Đóng">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M18 6L6 18M6 6l12 12"/>
         </svg>
       </button>
+      <div class="modal-brand">
+        <span class="modal-brand-name">AZERST</span>
+      </div>
       <div class="modal-media" id="modalMedia">
-        <img id="modalImg" src="" alt="" />
+        <img id="modalImg" src="" alt="AZERST" />
         <div class="pending">Đang cập nhật</div>
       </div>
       <div class="modal-footer">
-        <span class="modal-file" id="modalFile">image.png</span>
         <button class="modal-dl" id="modalDl" type="button" aria-label="Tải xuống">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 3v12M6 11l6 6 6-6M5 21h14"/>
@@ -864,6 +1004,15 @@
     }
 
     /* =========================================================
+       FILENAME → AZERST
+    ========================================================= */
+    function getAzerstFilename(origName) {
+      const m = /\.(png|jpg|jpeg|webp|gif)$/i.exec(origName || '');
+      const ext = m ? m[1].toLowerCase() : 'png';
+      return `Azerst.${ext}`;
+    }
+
+    /* =========================================================
        RENDER
     ========================================================= */
     function renderGrid(gridEl, bp, files) {
@@ -871,20 +1020,20 @@
         const url = buildUrl(bp, file);
         return `
           <article class="item">
-            <div class="item-media" data-url="${url}" data-filename="${file}" role="button" tabindex="0" aria-label="Xem ${file}">
-              <img src="${url}" alt="${file}" loading="lazy"
+            <div class="item-media" data-url="${url}" data-filename="${file}" role="button" tabindex="0" aria-label="Xem ảnh">
+              <img src="${url}" alt="AZERST" loading="lazy"
                    onerror="this.closest('.item-media').classList.add('is-error')" />
               <div class="pending">Đang cập nhật</div>
             </div>
             <div class="item-actions">
-              <button type="button" class="btn-action btn-view" data-url="${url}" data-filename="${file}" aria-label="Xem ${file}">
+              <button type="button" class="btn-action btn-view" data-url="${url}" data-filename="${file}" aria-label="Xem ảnh">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
                 Xem
               </button>
-              <button type="button" class="btn-action btn-dl" data-url="${url}" data-filename="${file}" aria-label="Tải ${file}">
+              <button type="button" class="btn-action btn-dl" data-url="${url}" data-filename="${file}" aria-label="Tải ảnh">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 3v12M6 11l6 6 6-6M5 21h14"/>
                 </svg>
@@ -926,10 +1075,11 @@
     })();
 
     /* =========================================================
-       DOWNLOAD
+       DOWNLOAD → tên Azerst.ext
     ========================================================= */
-    async function downloadFile(url, filename, btn) {
+    async function downloadFile(url, origFilename, btn) {
       if (btn) btn.classList.add('is-loading');
+      const saveName = getAzerstFilename(origFilename);
       try {
         const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
         if (!res.ok) throw new Error('fetch failed');
@@ -937,7 +1087,7 @@
         const objectUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = objectUrl;
-        a.download = filename;
+        a.download = saveName;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -952,12 +1102,11 @@
     /* =========================================================
        MODAL
     ========================================================= */
-    const modal       = document.getElementById('modal');
-    const modalClose  = document.getElementById('modalClose');
-    const modalMedia  = document.getElementById('modalMedia');
-    const modalImg    = document.getElementById('modalImg');
-    const modalFile   = document.getElementById('modalFile');
-    const modalDl     = document.getElementById('modalDl');
+    const modal      = document.getElementById('modal');
+    const modalClose = document.getElementById('modalClose');
+    const modalMedia = document.getElementById('modalMedia');
+    const modalImg   = document.getElementById('modalImg');
+    const modalDl    = document.getElementById('modalDl');
 
     let currentUrl = '';
     let currentFilename = '';
@@ -968,10 +1117,7 @@
       modalMedia.classList.remove('is-error');
       modalImg.onerror = () => modalMedia.classList.add('is-error');
       modalImg.src = url;
-      modalImg.alt = filename;
-      modalFile.textContent = filename;
-      modalDl.dataset.url = url;
-      modalDl.dataset.filename = filename;
+      modalImg.alt = 'AZERST';
       modal.classList.add('is-open');
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
@@ -1022,7 +1168,7 @@
       if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
     });
 
-    /* Hỗ trợ bàn phím cho ảnh */
+    /* Keyboard for media */
     document.addEventListener('keydown', e => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       const media = e.target.closest('.item-media');
