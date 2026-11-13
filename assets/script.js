@@ -52,29 +52,21 @@ function showToast(message, type = 'info') {
   clearTimeout(toastTimer);
   toastEl.textContent = message;
   toastEl.className = 'toast toast-' + type;
-  // force reflow để animation chạy lại
   void toastEl.offsetWidth;
   toastEl.classList.add('is-show');
-  toastTimer = setTimeout(() => {
-    toastEl.classList.remove('is-show');
-  }, 2600);
+  toastTimer = setTimeout(() => toastEl.classList.remove('is-show'), 2600);
 }
 
 /* =========================================================
-   VERIFY IMAGE (dùng khi fetch fail — kiểm tra ảnh có tồn tại thật không)
+   VERIFY IMAGE
 ========================================================= */
 function verifyImage(url) {
   return new Promise(resolve => {
     const img = new Image();
     let done = false;
-    const finish = ok => {
-      if (done) return;
-      done = true;
-      resolve(ok);
-    };
+    const finish = ok => { if (done) return; done = true; resolve(ok); };
     img.onload  = () => finish(true);
     img.onerror = () => finish(false);
-    // Không set crossOrigin → tránh fail giả do CORS
     img.src = url;
     setTimeout(() => finish(false), 8000);
   });
@@ -109,8 +101,6 @@ function renderGrid(gridEl, bp, files) {
       </article>
     `;
   }).join('');
-
-  // Gắn handler cho từng ảnh mới render
   attachImageHandlers(gridEl);
 }
 
@@ -119,9 +109,7 @@ function attachImageHandlers(container) {
     const media = img.closest('.item-media');
     if (!media) return;
     const fail = () => media.classList.add('is-error');
-
     if (img.complete) {
-      // Ảnh đã load xong (kể cả lỗi) trước khi gắn handler
       if (img.naturalWidth === 0) fail();
     } else {
       img.addEventListener('error', fail, { once: true });
@@ -132,7 +120,6 @@ function attachImageHandlers(container) {
 renderGrid(document.getElementById('grid-t1'), 'BP104', BP104);
 renderGrid(document.getElementById('grid-t2'), 'BP105', BP105);
 
-/* Bắt lỗi ảnh phát sinh sau đó */
 document.addEventListener('error', e => {
   if (e.target && e.target.tagName === 'IMG') {
     const media = e.target.closest('.item-media');
@@ -173,15 +160,9 @@ function findMediaByUrl(url) {
 }
 
 /* =========================================================
-   DOWNLOAD — KHÔNG BAO GIỜ MỞ LINK ẢNH NỮA
-   1) Nếu ảnh đã lỗi → toast "Ảnh chưa cập nhật"
-   2) Fetch OK    → tải xuống (Azerst.ext)
-   3) Fetch fail  → verify bằng Image:
-        - Ảnh không tồn tại → toast "Ảnh chưa cập nhật"
-        - Ảnh tồn tại nhưng CORS → toast "Không thể tải"
+   DOWNLOAD
 ========================================================= */
 async function downloadFile(url, origFilename, btn) {
-  // Bước 1: ảnh đã biết lỗi trong grid → toast ngay
   const media = findMediaByUrl(url);
   if (media && media.classList.contains('is-error')) {
     showToast('Ảnh chưa cập nhật, vui lòng thử lại sau', 'warning');
@@ -191,7 +172,6 @@ async function downloadFile(url, origFilename, btn) {
   if (btn) btn.classList.add('is-loading');
   const saveName = getAzerstFilename(origFilename);
 
-  // Bước 2: thử fetch blob
   try {
     const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -208,23 +188,19 @@ async function downloadFile(url, origFilename, btn) {
     if (btn) btn.classList.remove('is-loading');
     return;
   } catch (err) {
-    // fetch thất bại → phân biệt 404 vs CORS
+    // fallback
   }
 
-  // Bước 3: verify bằng Image để biết ảnh có tồn tại thật không
   const exists = await verifyImage(url);
   if (btn) btn.classList.remove('is-loading');
 
   if (!exists) {
-    // Ảnh không tồn tại → đánh dấu lỗi và báo "chưa cập nhật"
     if (media) media.classList.add('is-error');
-    // Nếu ảnh đang mở trong modal cũng đánh dấu
     if (currentUrl === url && modalMedia) modalMedia.classList.add('is-error');
     showToast('Ảnh chưa cập nhật, vui lòng thử lại sau', 'warning');
     return;
   }
 
-  // Ảnh tồn tại nhưng fetch bị CORS chặn
   showToast('Không thể tải ảnh. Vui lòng thử lại sau', 'error');
 }
 
@@ -244,13 +220,10 @@ function openModal(url, filename) {
   currentUrl = url;
   currentFilename = filename;
   modalMedia.classList.remove('is-error');
-
-  // Nếu ảnh grid đã biết lỗi → modal cũng hiện "Đang cập nhật"
   const media = findMediaByUrl(url);
   if (media && media.classList.contains('is-error')) {
     modalMedia.classList.add('is-error');
   }
-
   modalImg.onerror = () => modalMedia.classList.add('is-error');
   modalImg.src = url;
   modalImg.alt = 'AZERST';
@@ -269,7 +242,6 @@ function closeModal() {
   }, 350);
 }
 
-/* Click Xem / ảnh */
 document.addEventListener('click', e => {
   const trigger = e.target.closest('.btn-view, .item-media');
   if (!trigger) return;
@@ -278,7 +250,6 @@ document.addEventListener('click', e => {
   openModal(trigger.dataset.url, trigger.dataset.filename);
 });
 
-/* Click Tải (grid) */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.btn-dl');
   if (!btn) return;
@@ -287,14 +258,11 @@ document.addEventListener('click', e => {
   downloadFile(btn.dataset.url, btn.dataset.filename, btn);
 });
 
-/* Modal controls */
 modalClose.addEventListener('click', closeModal);
 
 modalDl.addEventListener('click', e => {
   e.preventDefault();
   e.stopPropagation();
-
-  // Nếu ảnh trong modal đang lỗi → không tải, chỉ toast
   if (modalMedia.classList.contains('is-error')) {
     showToast('Ảnh chưa cập nhật, vui lòng thử lại sau', 'warning');
     return;
