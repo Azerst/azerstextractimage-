@@ -7,6 +7,9 @@
   <meta name="referrer" content="no-referrer" />
   <title>AZERST — Booyah Pass</title>
 
+  <!-- Theme init — chạy đồng bộ TRƯỚC CSS để không nháy trắng -->
+  <script src="./assets/theme-init.js"></script>
+
   <link rel="preload" as="font" type="font/woff2" crossorigin
         href="https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Bold.woff2">
   <link rel="preload" as="font" type="font/woff2" crossorigin
@@ -15,6 +18,17 @@
   <link rel="stylesheet" href="./assets/style.css" />
 </head>
 <body>
+
+  <!-- THEME TOGGLE -->
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Đổi giao diện sáng / tối">
+    <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+    </svg>
+  </button>
 
   <!-- BACKGROUND GLOW -->
   <div class="bg-glow" aria-hidden="true"><span class="g3"></span></div>
@@ -93,7 +107,7 @@
   <!-- TOAST -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <!-- GUARD OVERLAY (hiện khi phát hiện F12 / DevTools) -->
+  <!-- GUARD OVERLAY -->
   <div class="guard-overlay" id="guardOverlay" role="alertdialog" aria-modal="true" aria-hidden="true">
     <div class="guard-card">
       <div class="guard-icon">!</div>
