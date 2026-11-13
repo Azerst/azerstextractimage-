@@ -3,718 +3,281 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tìm Kiếm Item — Free Fire</title>
+<title>Free Fire BP104 - Link & Ảnh</title>
 <style>
-/* ===== FONT GFF ===== */
-@font-face{
-    font-family:"GFF-Latin-Bold";
-    src:
-        url("https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Bold.woff2") format("woff2"),
-        url("https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Bold.woff") format("woff");
-    font-display: swap;
-}
-
-*{ box-sizing: border-box; }
-
-html, body{ min-height: 100%; }
-
-body{
-    margin: 0;
-    font-family: "GFF-Latin-Bold", "Segoe UI", Roboto, Arial, sans-serif;
-    color: #e9eefb;
-    background: #05070d;
-    -webkit-font-smoothing: antialiased;
-}
-
-/* ===== NỀN ===== */
-body::before{
-    content:"";
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    background-image: url("https://dl.aw.freefiremobile.com/common/OB55/CSH/gacha/TokenWheel3_20261108_FistCosmicComet_LobbyBG_VN_vn.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: brightness(.42) saturate(1.15);
-    transform: scale(1.02);
-}
-
-body::after{
-    content:"";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background:
-        radial-gradient(1200px 600px at 50% -10%, rgba(120,180,255,.20), transparent 60%),
-        linear-gradient(180deg, rgba(5,7,13,.55) 0%, rgba(5,7,13,.88) 55%, rgba(5,7,13,.97) 100%);
-}
-
-/* ===== HEADER ===== */
-header{
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    padding: 16px 16px 14px;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    background: linear-gradient(180deg, rgba(9,13,24,.92), rgba(9,13,24,.62));
-    border-bottom: 1px solid rgba(140,180,255,.16);
-}
-
-.wrap{ max-width: 940px; margin: 0 auto; }
-
-.title-row{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-}
-
-h1{
-    font-size: 19px;
-    margin: 0;
-    letter-spacing: .4px;
-    background: linear-gradient(90deg,#ffe08a,#8fd3ff 55%,#c9a6ff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 0 22px rgba(120,180,255,.25);
-}
-
-.count-badge{
-    margin-left: auto;
-    font-size: 12px;
-    padding: 5px 11px;
-    border-radius: 999px;
-    color: #bfe0ff;
-    background: rgba(90,150,255,.13);
-    border: 1px solid rgba(120,180,255,.28);
-    white-space: nowrap;
-}
-
-/* ===== SEARCH ===== */
-.search-box{
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.search-box svg{
-    position: absolute;
-    left: 14px;
-    width: 18px;
-    height: 18px;
-    opacity: .65;
-    pointer-events: none;
-    fill: #9fc4ff;
-}
-
-#searchInput{
-    width: 100%;
-    padding: 13px 92px 13px 42px;
-    font-family: inherit;
-    font-size: 14px;
-    color: #eaf2ff;
-    background: rgba(16,24,42,.85);
-    border: 1px solid rgba(120,180,255,.28);
-    border-radius: 14px;
-    outline: none;
-    transition: border-color .18s, box-shadow .18s, background .18s;
-}
-
-#searchInput::placeholder{ color: #6f86ac; }
-
-#searchInput:focus{
-    border-color: rgba(140,200,255,.75);
-    background: rgba(20,30,52,.95);
-    box-shadow: 0 0 0 4px rgba(80,150,255,.15), 0 0 26px rgba(80,150,255,.18);
-}
-
-#clearBtn{
-    position: absolute;
-    right: 8px;
-    font-family: inherit;
-    font-size: 12px;
-    padding: 8px 13px;
-    border-radius: 10px;
-    cursor: pointer;
-    color: #0d1220;
-    background: linear-gradient(180deg,#ffe9a8,#f5c451);
-    border: none;
-    opacity: 0;
-    transform: scale(.9);
-    pointer-events: none;
-    transition: opacity .18s, transform .18s;
-    white-space: nowrap;
-}
-#clearBtn.show{ opacity: 1; transform: scale(1); pointer-events: auto; }
-#clearBtn:active{ transform: scale(.95); }
-
-/* ===== LIST ===== */
-main{ padding: 18px 16px 90px; }
-
-#list{ display: flex; flex-direction: column; gap: 9px; }
-
-.item{
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 11px 14px;
-    border-radius: 13px;
-    background: rgba(255,255,255,.045);
-    border: 1px solid rgba(255,255,255,.075);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    transition: background .15s, border-color .15s, transform .15s;
-    animation: fadeIn .22s ease both;
-}
-
-.item:hover{
-    background: rgba(120,180,255,.10);
-    border-color: rgba(140,200,255,.34);
-    transform: translateX(2px);
-}
-
-@keyframes fadeIn{
-    from{ opacity: 0; transform: translateY(6px); }
-    to{ opacity: 1; transform: translateY(0); }
-}
-
-.idx{
-    flex: 0 0 auto;
-    min-width: 62px;
-    text-align: center;
-    font-size: 12px;
-    padding: 5px 8px;
-    border-radius: 9px;
-    color: #10151f;
-    background: linear-gradient(180deg,#ffe9a8,#e9b73f);
-    box-shadow: 0 2px 10px rgba(233,183,63,.22);
-    letter-spacing: .3px;
-}
-
-.text{
-    flex: 1 1 auto;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #dfe9fb;
-    word-break: break-word;
-    white-space: pre-wrap;
-    min-width: 0;
-}
-
-mark{
-    color: #10151f;
-    background: linear-gradient(180deg,#a9e7ff,#5fc8ff);
-    border-radius: 4px;
-    padding: 0 2px;
-}
-
-/* ===== EMPTY / LOADER ===== */
-.empty{
-    text-align: center;
-    padding: 60px 20px;
-    color: #8ea3c6;
-    font-size: 14px;
-    line-height: 1.7;
-}
-
-#sentinel{ height: 1px; }
-
-#loading{
-    text-align: center;
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #e2e8f0;
+    min-height: 100vh;
     padding: 20px;
-    font-size: 12px;
-    color: #7f95b8;
-    letter-spacing: .5px;
-}
-
-/* ===== OVERLAY NẠP DỮ LIỆU ===== */
-#loader{
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: none;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 2rem;
+    background: linear-gradient(90deg, #f97316, #ef4444, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    text-align: center;
+    color: #94a3b8;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+  }
+  .stats {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(249, 115, 22, 0.2);
+    border-color: #f97316;
+  }
+  .card-header {
+    padding: 10px 14px;
+    background: #0f172a;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .filename {
+    font-size: 0.8rem;
+    color: #f97316;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+  }
+  .index {
+    background: #f97316;
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .img-wrapper {
+    background: #0f172a;
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    background: rgba(3,6,12,.88);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-#loader.show{ display: flex; }
-
-.loader-card{
-    width: 100%;
-    max-width: 520px;
-    padding: 26px 24px;
-    border-radius: 20px;
-    background: rgba(14,21,38,.96);
-    border: 1px solid rgba(120,180,255,.28);
-    box-shadow: 0 24px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03) inset;
+    min-height: 180px;
+    padding: 10px;
+    position: relative;
+  }
+  .img-wrapper img {
+    max-width: 100%;
+    max-height: 260px;
+    object-fit: contain;
+    display: block;
+    border-radius: 6px;
+    transition: opacity 0.3s;
+    opacity: 0;
+  }
+  .img-wrapper img.loaded { opacity: 1; }
+  .img-wrapper img.error { display: none; }
+  .error-msg {
+    color: #ef4444;
+    font-size: 0.8rem;
     text-align: center;
-}
-
-.loader-card h2{
-    margin: 0 0 10px;
-    font-size: 17px;
-    color: #ffe08a;
-}
-
-.loader-card p{
-    margin: 0 0 16px;
-    font-size: 13px;
-    line-height: 1.65;
-    color: #9fb2d4;
-}
-.loader-card b{ color: #cfe2ff; }
-
-.btn-file{
-    display: inline-block;
-    padding: 12px 22px;
-    border-radius: 12px;
-    font-size: 14px;
+    padding: 20px;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+  .loader {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #334155;
+    border-top-color: #f97316;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .loader.hide { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .card-footer {
+    padding: 10px 14px;
+    border-top: 1px solid #334155;
+    display: flex;
+    gap: 8px;
+  }
+  .btn {
+    flex: 1;
+    text-align: center;
+    padding: 7px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s;
     cursor: pointer;
-    color: #0d1220;
-    background: linear-gradient(180deg,#ffe9a8,#f0bd48);
-    box-shadow: 0 8px 24px rgba(240,189,72,.28);
-    transition: transform .15s, box-shadow .15s;
-    user-select: none;
-}
-.btn-file:hover{ transform: translateY(-1px); box-shadow: 0 12px 28px rgba(240,189,72,.38); }
-.btn-file:active{ transform: scale(.97); }
-
-.hint{
-    margin: 14px 0 0 !important;
-    font-size: 12px !important;
-    color: #6f86ac !important;
-}
-
-.loader-card details{
-    margin-top: 18px;
-    text-align: left;
-    border-top: 1px solid rgba(120,180,255,.16);
-    padding-top: 14px;
-}
-
-.loader-card summary{
-    cursor: pointer;
-    font-size: 13px;
-    color: #9fc4ff;
-    outline: none;
-    user-select: none;
-}
-
-#pasteArea{
-    width: 100%;
-    height: 110px;
-    margin-top: 12px;
-    padding: 10px 12px;
-    font-family: inherit;
-    font-size: 12px;
-    color: #dbe7fb;
-    background: rgba(9,14,26,.95);
-    border: 1px solid rgba(120,180,255,.25);
-    border-radius: 10px;
-    resize: vertical;
-    outline: none;
-}
-#pasteArea:focus{ border-color: rgba(140,200,255,.7); }
-
-#pasteBtn{
-    margin-top: 10px;
-    padding: 10px 18px;
-    font-family: inherit;
-    font-size: 13px;
-    border-radius: 10px;
-    border: 1px solid rgba(120,180,255,.35);
-    background: rgba(90,150,255,.18);
-    color: #cfe2ff;
-    cursor: pointer;
-}
-#pasteBtn:hover{ background: rgba(90,150,255,.3); }
-
-.drop-active .loader-card{
-    border-color: rgba(255,224,138,.9);
-    box-shadow: 0 0 0 3px rgba(255,224,138,.25), 0 24px 70px rgba(0,0,0,.6);
-}
-
-/* ===== SCROLLBAR ===== */
-::-webkit-scrollbar{ width: 10px; }
-::-webkit-scrollbar-track{ background: rgba(255,255,255,.03); }
-::-webkit-scrollbar-thumb{
-    background: rgba(120,180,255,.32);
-    border-radius: 10px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover{ background: rgba(120,180,255,.55); background-clip: content-box; }
-
-@media (max-width: 520px){
-    .idx{ min-width: 52px; font-size: 11px; }
-    .text{ font-size: 13px; }
-    h1{ font-size: 16px; }
-    #searchInput{ padding-right: 80px; font-size: 13px; }
-}
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .btn-open {
+    background: #f97316;
+    color: #0f172a;
+  }
+  .btn-open:hover { background: #fb923c; }
+  .btn-copy {
+    background: #334155;
+    color: #e2e8f0;
+  }
+  .btn-copy:hover { background: #475569; }
+  .btn-copy.copied {
+    background: #22c55e;
+    color: #fff;
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 1.4rem; }
+    .grid { grid-template-columns: 1fr; gap: 15px; }
+  }
 </style>
 </head>
 <body>
 
-<header>
-    <div class="wrap">
-        <div class="title-row">
-            <h1>TÌM KIẾM ITEM</h1>
-            <span class="count-badge" id="countBadge">0 item</span>
-        </div>
+<h1>🔥 Free Fire BP104 Gallery</h1>
+<p class="subtitle">Danh sách link & ảnh Battle Pass 104</p>
+<p class="stats" id="stats">Đang tải...</p>
 
-        <div class="search-box">
-            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
-            <input id="searchInput" type="text" placeholder="Nhập nội dung hoặc số index..." autocomplete="off" spellcheck="false">
-            <button id="clearBtn" type="button">Xóa</button>
-        </div>
-    </div>
-</header>
-
-<main>
-    <div class="wrap">
-        <div id="list"></div>
-        <div id="loading">Đang tải...</div>
-        <div id="sentinel"></div>
-    </div>
-</main>
-
-<!-- ===== OVERLAY NẠP DỮ LIỆU ===== -->
-<div id="loader" class="show">
-    <div class="loader-card">
-        <h2>Chưa có dữ liệu</h2>
-        <p>Đặt file <b>AzerstOB56VN.txt</b> cùng thư mục với file HTML này rồi mở lại trang.<br>Hoặc chọn file bên dưới:</p>
-
-        <label class="btn-file">
-            Chọn file .txt
-            <input type="file" id="fileInput" accept=".txt,text/plain" hidden>
-        </label>
-
-        <p class="hint">… hoặc kéo &amp; thả file vào đây</p>
-
-        <details>
-            <summary>Dán nội dung trực tiếp</summary>
-            <textarea id="pasteArea" placeholder="index&#9;text&#10;0&#9;Balo - Đại Đao Zabuza&#10;1&#9;Đã nâng cấp {0}"></textarea>
-            <button id="pasteBtn" type="button">Nạp dữ liệu</button>
-        </details>
-    </div>
-</div>
+<div class="grid" id="grid"></div>
 
 <script>
-(function () {
-    "use strict";
+const urls = [
+  "https://dl-tata.freefireind.in/common/OB56/CSH/BP104/BP_Prize_104.png",
+  "https://dl-tata.freefireind.in/common/OB56/CSH/BP104/BP_Task_FP_104.png",
+  "https://dl-tata.freefireind.in/common/OB56/CSH/BP104/BP_104.png",
+  "https://dl-tata.freefireind.in/common/OB56/CSH/BP104/BP_Window_PP_104.png",
+  "https://dl-tata.freefireind.in/common/OB56/CSH/BP104/BP_Premium_icon_104.png",
+  "https://dl-tata.freefireind.in/common/OB56/CSH/BP104/BP_Icon_free_104.png",
+  "https://dl-tata.freefireind.in/common/OB56/CSH/BP104/subtype36_104.png",
+  "https://dl-tata.freefireind.in/common/OB56/CSH/BP104/subtype1_104.jpg",
+  "https://dl-tata.freefireind.in/common/OB56/CSH/BP104/subtype2_104.jpg",
+  "https://dl-tata.freefireind.in/common/OB56/CSH/BP104/subtype3_104.jpg",
+  "https://dl.dir.freefiremobile.com/common/OB56/CSH/BP104/subtype7_104.jpg",
+  "https://dl.dir.freefiremobile.com/common/OB56/CSH/BP104/BP_Premium_title_104.png",
+  "https://dl.dir.freefiremobile.com/common/OB56/CSH/BP104/BP_GRANDPrize01_104.jpg",
+  "https://dl.dir.freefiremobile.com/common/OB56/CSH/BP104/BP_GRANDPrize02_104.jpg",
+  "https://dl.dir.freefiremobile.com/common/OB56/CSH/BP104/BP_GRANDPrize03_104.jpg",
+  "https://dl.dir.freefiremobile.com/common/OB56/CSH/BP104/BP_GRANDPrize04_104.jpg",
+  "https://dl.dir.freefiremobile.com/common/OB56/CSH/BP104/BP_GRANDPrize05_104.jpg",
+  "https://dl.dir.freefiremobile.com/common/OB56/CSH/BP104/BP_GRANDPrize06_104.jpg"
+];
 
-    /* ======================= TRẠNG THÁI ======================= */
-    var state = {
-        data: [],       // { i, text, n }
-        results: [],
-        rendered: 0,
-        pageSize: 100,
-        query: ""
-    };
+const grid = document.getElementById('grid');
+const stats = document.getElementById('stats');
 
-    var el = function (id) { return document.getElementById(id); };
+let loadedCount = 0;
+let errorCount = 0;
 
-    var listEl      = el("list");
-    var loadingEl   = el("loading");
-    var sentinelEl  = el("sentinel");
-    var countBadge  = el("countBadge");
-    var searchInput = el("searchInput");
-    var clearBtn    = el("clearBtn");
-    var loaderEl    = el("loader");
+urls.forEach((url, i) => {
+  const filename = url.split('/').pop();
 
-    /* ======================= CHUẨN HÓA TIẾNG VIỆT ======================= */
-    // Bỏ dấu, giữ nguyên độ dài chuỗi để highlight chính xác
-    function normChar(ch) {
-        var base = ch.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        if (!base) base = ch;
-        var c = base.charAt(0).toLowerCase();
-        if (c === "đ") c = "d";
-        return c;
-    }
+  const card = document.createElement('div');
+  card.className = 'card';
 
-    function norm(str) {
-        var out = "";
-        for (var k = 0; k < str.length; k++) {
-            out += normChar(str.charAt(k));
-        }
-        return out;
-    }
+  card.innerHTML = `
+    <div class="card-header">
+      <span class="filename">${filename}</span>
+      <span class="index">#${i + 1}</span>
+    </div>
+    <div class="img-wrapper">
+      <div class="loader" id="loader-${i}"></div>
+      <img src="${url}" alt="${filename}" loading="lazy" id="img-${i}">
+      <div class="error-msg" id="err-${i}">⚠️ Không tải được ảnh</div>
+    </div>
+    <div class="card-footer">
+      <a class="btn btn-open" href="${url}" target="_blank" rel="noopener">🔗 Mở link</a>
+      <button class="btn btn-copy" data-url="${url}">📋 Copy</button>
+    </div>
+  `;
 
-    function escapeHtml(s) {
-        return s.replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;");
-    }
+  const img = card.querySelector(`#img-${i}`);
+  const loader = card.querySelector(`#loader-${i}`);
+  const err = card.querySelector(`#err-${i}`);
 
-    /* ======================= PARSE DỮ LIỆU ======================= */
-    function parseData(raw) {
-        var lines = raw.split(/\r?\n/);
-        var arr = [];
+  img.addEventListener('load', () => {
+    loader.classList.add('hide');
+    img.classList.add('loaded');
+    loadedCount++;
+    updateStats();
+  });
 
-        for (var k = 0; k < lines.length; k++) {
-            var line = lines[k];
-            if (!line) continue;
+  img.addEventListener('error', () => {
+    loader.classList.add('hide');
+    err.classList.add('show');
+    errorCount++;
+    updateStats();
+  });
 
-            var tab = line.indexOf("\t");
-            if (tab === -1) continue;
-
-            var idxStr = line.substring(0, tab).trim();
-            if (!/^\d+$/.test(idxStr)) continue; // bỏ dòng header "index text"
-
-            var content = line.substring(tab + 1);
-            if (content === "") continue;
-
-            arr.push({
-                i: parseInt(idxStr, 10),
-                text: content,
-                n: norm(content)
-            });
-        }
-        return arr;
-    }
-
-    /* ======================= RENDER ======================= */
-    function highlight(text, normText, q) {
-        if (!q) return escapeHtml(text);
-
-        var nq = norm(q);
-        if (!nq) return escapeHtml(text);
-
-        var out = "";
-        var pos = 0;
-        var idx;
-
-        while ((idx = normText.indexOf(nq, pos)) !== -1) {
-            out += escapeHtml(text.substring(pos, idx));
-            out += "<mark>" + escapeHtml(text.substr(idx, nq.length)) + "</mark>";
-            pos = idx + nq.length;
-        }
-        out += escapeHtml(text.substring(pos));
-        return out;
-    }
-
-    function makeRow(item, q) {
-        var row = document.createElement("div");
-        row.className = "item";
-
-        var idx = document.createElement("div");
-        idx.className = "idx";
-        idx.textContent = item.i;
-
-        var txt = document.createElement("div");
-        txt.className = "text";
-        txt.innerHTML = highlight(item.text, item.n, q);
-
-        row.appendChild(idx);
-        row.appendChild(txt);
-        return row;
-    }
-
-    function renderMore() {
-        if (state.rendered >= state.results.length) {
-            loadingEl.style.display = "none";
-            return;
-        }
-
-        var end = Math.min(state.rendered + state.pageSize, state.results.length);
-        var frag = document.createDocumentFragment();
-
-        for (var k = state.rendered; k < end; k++) {
-            frag.appendChild(makeRow(state.results[k], state.query));
-        }
-
-        listEl.appendChild(frag);
-        state.rendered = end;
-
-        loadingEl.style.display = (state.rendered < state.results.length) ? "block" : "none";
-        loadingEl.textContent = "Đang tải thêm... (" + state.rendered + "/" + state.results.length + ")";
-    }
-
-    function applyFilter(q) {
-        state.query = q;
-
-        var key = norm(q.trim());
-
-        if (!key) {
-            state.results = state.data;
-        } else {
-            var res = [];
-            var data = state.data;
-            for (var k = 0; k < data.length; k++) {
-                var it = data[k];
-                if (it.n.indexOf(key) !== -1 || String(it.i).indexOf(key) !== -1) {
-                    res.push(it);
-                }
-            }
-            state.results = res;
-        }
-
-        state.rendered = 0;
-        listEl.innerHTML = "";
-
-        updateCount();
-
-        if (state.results.length === 0) {
-            loadingEl.style.display = "none";
-            listEl.innerHTML = '<div class="empty">Không tìm thấy kết quả nào phù hợp.<br>Thử một từ khóa khác nhé!</div>';
-            return;
-        }
-
-        renderMore();
-    }
-
-    function updateCount() {
-        if (!state.data.length) {
-            countBadge.textContent = "0 item";
-            return;
-        }
-        if (!state.query.trim()) {
-            countBadge.textContent = state.data.length + " item";
-        } else {
-            countBadge.textContent = state.results.length + " / " + state.data.length + " item";
-        }
-    }
-
-    /* ======================= NẠP DỮ LIỆU ======================= */
-    function loadText(raw) {
-        var arr = parseData(raw);
-
-        if (!arr.length) {
-            alert("Không đọc được dữ liệu. Hãy kiểm tra lại định dạng file (index TAB text).");
-            return;
-        }
-
-        state.data = arr;
-        state.results = arr;
-        state.rendered = 0;
-        state.query = "";
-
-        searchInput.value = "";
-        clearBtn.classList.remove("show");
-        listEl.innerHTML = "";
-
-        loaderEl.classList.remove("show");
-        updateCount();
-        renderMore();
-    }
-
-    function readFile(file) {
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function (e) { loadText(String(e.target.result)); };
-        reader.onerror = function () { alert("Đọc file thất bại!"); };
-        reader.readAsText(file, "UTF-8");
-    }
-
-    /* ======================= SỰ KIỆN ======================= */
-    // Ô tìm kiếm (debounce)
-    var timer = null;
-    searchInput.addEventListener("input", function () {
-        var v = searchInput.value;
-        clearBtn.classList.toggle("show", v.length > 0);
-
-        clearTimeout(timer);
-        timer = setTimeout(function () { applyFilter(v); }, 110);
+  card.querySelector('.btn-copy').addEventListener('click', function() {
+    navigator.clipboard.writeText(url).then(() => {
+      this.classList.add('copied');
+      const originalText = this.textContent;
+      this.textContent = '✅ Đã copy';
+      setTimeout(() => {
+        this.classList.remove('copied');
+        this.textContent = originalText;
+      }, 1500);
+    }).catch(() => {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      this.classList.add('copied');
+      const t = this.textContent;
+      this.textContent = '✅ Đã copy';
+      setTimeout(() => {
+        this.classList.remove('copied');
+        this.textContent = t;
+      }, 1500);
     });
+  });
 
-    clearBtn.addEventListener("click", function () {
-        searchInput.value = "";
-        clearBtn.classList.remove("show");
-        applyFilter("");
-        searchInput.focus();
-    });
+  grid.appendChild(card);
+});
 
-    searchInput.addEventListener("keydown", function (e) {
-        if (e.key === "Escape") {
-            searchInput.value = "";
-            clearBtn.classList.remove("show");
-            applyFilter("");
-        }
-    });
-
-    // Phím tắt "/" để focus ô tìm kiếm
-    document.addEventListener("keydown", function (e) {
-        if (e.key === "/" && document.activeElement !== searchInput &&
-            document.activeElement !== el("pasteArea")) {
-            e.preventDefault();
-            searchInput.focus();
-        }
-    });
-
-    // Chọn file
-    el("fileInput").addEventListener("change", function (e) {
-        readFile(e.target.files[0]);
-    });
-
-    // Dán nội dung
-    el("pasteBtn").addEventListener("click", function () {
-        var v = el("pasteArea").value;
-        if (!v.trim()) { alert("Nội dung trống!"); return; }
-        loadText(v);
-    });
-
-    // Kéo & thả
-    ["dragenter", "dragover"].forEach(function (ev) {
-        window.addEventListener(ev, function (e) {
-            e.preventDefault();
-            loaderEl.classList.add("drop-active");
-        });
-    });
-    ["dragleave", "drop"].forEach(function (ev) {
-        window.addEventListener(ev, function (e) {
-            e.preventDefault();
-            if (ev === "dragleave" && e.relatedTarget) return;
-            loaderEl.classList.remove("drop-active");
-        });
-    });
-    window.addEventListener("drop", function (e) {
-        e.preventDefault();
-        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
-            readFile(e.dataTransfer.files[0]);
-        }
-    });
-
-    // Vô hạn cuộn
-    if ("IntersectionObserver" in window) {
-        var io = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) renderMore();
-            });
-        }, { rootMargin: "600px 0px" });
-        io.observe(sentinelEl);
-    } else {
-        window.addEventListener("scroll", function () {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 700) {
-                renderMore();
-            }
-        });
-    }
-
-    /* ======================= TỰ ĐỘNG TẢI FILE ======================= */
-    // Thử fetch file cùng thư mục (chỉ hoạt động khi chạy qua http/https)
-    fetch("AzerstOB56VN.txt", { cache: "no-cache" })
-        .then(function (r) {
-            if (!r.ok) throw new Error("not found");
-            return r.text();
-        })
-        .then(function (text) {
-            if (text && text.indexOf("\t") !== -1) loadText(text);
-        })
-        .catch(function () {
-            // Chạy bằng file:// hoặc không tìm thấy file → hiện overlay nạp dữ liệu
-            loaderEl.classList.add("show");
-        });
-
-    loadingEl.style.display = "none";
-})();
+function updateStats() {
+  const done = loadedCount + errorCount;
+  if (done === urls.length) {
+    stats.textContent = `✅ Tải xong: ${loadedCount}/${urls.length} ảnh` +
+      (errorCount > 0 ? ` • ⚠️ ${errorCount} ảnh lỗi` : '');
+  } else {
+    stats.textContent = `Đang tải... ${done}/${urls.length} • ✅ ${loadedCount} • ❌ ${errorCount}`;
+  }
+}
+updateStats();
 </script>
+
 </body>
 </html>
