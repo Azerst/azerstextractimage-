@@ -188,7 +188,7 @@ async function downloadFile(url, origFilename, btn) {
     if (btn) btn.classList.remove('is-loading');
     return;
   } catch (err) {
-    // fallback
+    /* fallback */
   }
 
   const exists = await verifyImage(url);
@@ -216,32 +216,106 @@ const modalDl    = document.getElementById('modalDl');
 let currentUrl = '';
 let currentFilename = '';
 
-function openModal(url, filename) {
+/* ---------- LOAD IMAGE → BLOB (không lộ link gốc) ---------- */
+async function loadImageSafely(url, imgEl, mediaEl) {
+  // Thu hồi blob cũ nếu có
+  if (imgEl.dataset.blobUrl) {
+    try { URL.revokeObjectURL(imgEl.dataset.blobUrl); } catch (e) {}
+    delete imgEl.dataset.blobUrl;
+  }
+
+  mediaEl.classList.remove('is-error');
+  imgEl.onerror = () => mediaEl.classList.add('is-error');
+
+  // 1) Thử fetch → blob (URL thanh địa chỉ + img.src đều KHÔNG lộ link gốc)
+  try {
+    const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
+    if (res.ok) {
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      imgEl.dataset.blobUrl = objectUrl;
+      imgEl.src = objectUrl;
+      imgEl.alt = 'AZERST';
+      return;
+    }
+    // Server trả lỗi (404/403) → hiện "Đang cập nhật"
+    mediaEl.classList.add('is-error');
+    return;
+  } catch (err) {
+    // CORS chặn → fallback bên dưới
+  }
+
+  // 2) Fallback CORS: dùng link gốc — nhưng URL bar vẫn là #azer-image
+  imgEl.src = url;
+  imgEl.alt = 'AZERST';
+}
+
+async function openModal(url, filename) {
   currentUrl = url;
   currentFilename = filename;
   modalMedia.classList.remove('is-error');
-  const media = findMediaByUrl(url);
-  if (media && media.classList.contains('is-error')) {
-    modalMedia.classList.add('is-error');
+
+  /* Đổi URL bar → #azer-image để không lộ link gốc */
+  if (!history.state || !history.state.azerModal) {
+    try { history.pushState({ azerModal: true }, '', '#azer-image'); } catch (e) {}
   }
-  modalImg.onerror = () => modalMedia.classList.add('is-error');
-  modalImg.src = url;
-  modalImg.alt = 'AZERST';
+
   modal.classList.add('is-open');
   modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
+
+  /* Nếu ảnh grid đã biết lỗi → hiện pending luôn, không cần fetch */
+  const media = findMediaByUrl(url);
+  if (media && media.classList.contains('is-error')) {
+    modalMedia.classList.add('is-error');
+    return;
+  }
+
+  await loadImageSafely(url, modalImg, modalMedia);
 }
 
 function closeModal() {
+  const wasOpen = modal.classList.contains('is-open');
   modal.classList.remove('is-open');
   modal.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
+
+  /* Dọn ảnh sau khi animation đóng xong */
   setTimeout(() => {
+    if (modalImg.dataset.blobUrl) {
+      try { URL.revokeObjectURL(modalImg.dataset.blobUrl); } catch (e) {}
+      delete modalImg.dataset.blobUrl;
+    }
     modalImg.src = '';
     modalMedia.classList.remove('is-error');
   }, 350);
+
+  /* Trả URL về vị trí ban đầu */
+  if (wasOpen && history.state && history.state.azerModal) {
+    try { history.back(); } catch (e) {}
+  }
 }
 
+/* ---------- Xử lý nút Back của trình duyệt ---------- */
+window.addEventListener('popstate', () => {
+  if (modal.classList.contains('is-open')) {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      if (modalImg.dataset.blobUrl) {
+        try { URL.revokeObjectURL(modalImg.dataset.blobUrl); } catch (e) {}
+        delete modalImg.dataset.blobUrl;
+      }
+      modalImg.src = '';
+      modalMedia.classList.remove('is-error');
+    }, 350);
+  }
+});
+
+/* =========================================================
+   EVENTS
+========================================================= */
 document.addEventListener('click', e => {
   const trigger = e.target.closest('.btn-view, .item-media');
   if (!trigger) return;
