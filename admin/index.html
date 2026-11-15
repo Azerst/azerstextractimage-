@@ -40,9 +40,7 @@
 
     <div id="loginError" class="error" role="alert" hidden></div>
 
-    <button type="submit" class="btn-primary" id="loginBtn">
-      <span>ĐĂNG NHẬP</span>
-    </button>
+    <button type="submit" class="btn-primary" id="loginBtn"><span>ĐĂNG NHẬP</span></button>
     <p class="login-note">Phiên đăng nhập sẽ kết thúc khi đóng tab.</p>
   </form>
 </section>
@@ -67,7 +65,7 @@
     <section class="card">
       <header class="card-head">
         <h2>Cấu hình chung</h2>
-        <p class="hint">Domain + đường dẫn dùng để build URL ảnh.</p>
+        <p class="hint">Domain + đường dẫn dùng để build URL ảnh mặc định.</p>
       </header>
       <div class="grid-3">
         <div class="field">
@@ -75,7 +73,7 @@
           <input id="cfgDomainFile" type="url" spellcheck="false">
         </div>
         <div class="field">
-          <label for="cfgDomainDir">Domain ảnh dir <em>(GrandPrize / Title...)</em></label>
+          <label for="cfgDomainDir">Domain ảnh đặc biệt <em>(GrandPrize / Title...)</em></label>
           <input id="cfgDomainDir" type="url" spellcheck="false">
         </div>
         <div class="field">
@@ -87,24 +85,22 @@
 
     <section class="card">
       <header class="card-head">
-        <h2>Danh sách file</h2>
-        <p class="hint">Mỗi dòng 1 tên file. Dòng trống sẽ bị bỏ qua.</p>
+        <h2>Quản lý ảnh BOOYAH</h2>
+        <p class="hint">Sửa URL ảnh hoặc để trống dùng mặc định. Có thể xóa / thêm ảnh.</p>
       </header>
-      <div class="file-tabs" role="tablist">
-        <button type="button" class="file-tab is-active" data-bp="BP104">BP104</button>
-        <button type="button" class="file-tab" data-bp="BP105">BP105</button>
-        <button type="button" class="file-tab" data-bp="BP106">BP106</button>
-        <span class="file-count" id="fileCount"></span>
-      </div>
-      <textarea id="fileListEditor" rows="14" spellcheck="false" placeholder="Tên file, mỗi dòng 1 cái..."></textarea>
-    </section>
 
-    <section class="card">
-      <header class="card-head">
-        <h2>URL Override</h2>
-        <p class="hint">Định dạng: <code>BP104/tên_file.png=https://url...</code> — mỗi dòng 1 cặp.</p>
-      </header>
-      <textarea id="cfgOverrides" rows="6" spellcheck="false" placeholder="BP104/BP_104.png=https://example.com/custom-104.png&#10;BP105/subtype1_105.jpg=https://cdn.example.com/a.jpg"></textarea>
+      <div class="tabs" role="tablist">
+        <button type="button" class="tab is-active" data-bp="BP104" role="tab">BOOYAH <strong>1</strong></button>
+        <button type="button" class="tab" data-bp="BP105" role="tab">BOOYAH <strong>2</strong></button>
+        <button type="button" class="tab" data-bp="BP106" role="tab">BOOYAH <strong>3</strong></button>
+      </div>
+
+      <div class="toolbar">
+        <span class="count" id="imageCount">0 ảnh</span>
+        <button type="button" class="btn-small" id="addImageBtn">+ Thêm ảnh</button>
+      </div>
+
+      <div id="imageGrid" class="image-grid"></div>
     </section>
 
     <section class="card actions-card">
@@ -121,7 +117,7 @@
   </main>
 
   <footer class="admin-footer">
-    <p>AZERST · Admin v1.0 · Dữ liệu lưu trong <code>localStorage</code></p>
+    <p>AZERST · Admin v1.1 · Dữ liệu lưu trong <code>localStorage</code></p>
   </footer>
 </section>
 
