@@ -31,15 +31,11 @@
   showConsoleWarning();
   setInterval(showConsoleWarning, 20000);
 
-  ['drop', 'dragover', 'dragenter'].forEach(function (evt) {
-    document.addEventListener(evt, function (e) {
-      e.preventDefault(); e.stopPropagation();
-    }, true);
+  ['drop','dragover','dragenter'].forEach(function (evt) {
+    document.addEventListener(evt, function (e) { e.preventDefault(); e.stopPropagation(); }, true);
   });
 
-  window.addEventListener('beforeprint', function (e) {
-    e.preventDefault(); e.stopPropagation();
-  }, true);
+  window.addEventListener('beforeprint', function (e) { e.preventDefault(); e.stopPropagation(); }, true);
 
   document.addEventListener('keydown', function (e) {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
@@ -50,9 +46,7 @@
     }
   }, true);
 
-  document.addEventListener('mousedown', function (e) {
-    if (e.button === 1) e.preventDefault();
-  }, true);
+  document.addEventListener('mousedown', function (e) { if (e.button === 1) e.preventDefault(); }, true);
 
   document.addEventListener('dragstart', function (e) {
     if (e.target && e.target.tagName !== 'IMG') e.preventDefault();
