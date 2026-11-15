@@ -1,116 +1,108 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
-  <meta name="referrer" content="no-referrer" />
-  <title>AZERST — Booyah Pass</title>
-
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-        href="https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Bold.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-        href="https://dl.dir.freefiremobile.com/common/web_event/common/fonts/website/GFFLatinW05-Black.woff2">
-
-  <link rel="stylesheet" href="./assets/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eef2f6">
+<meta name="robots" content="noarchive">
+<title>AZERST</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="bg-glow" aria-hidden="true"><span class="g3"></span></div>
+<div class="bg-glow" aria-hidden="true"><span class="g3"></span></div>
 
-  <main class="page">
+<main class="page">
 
-    <header class="hero">
-      <h1 class="hero-title">AZERST</h1>
-      <p class="hero-sub">BOOYAH PASS GALLERY</p>
-    </header>
+  <header class="hero">
+    <h1 class="hero-title">AZERST</h1>
+    <p class="hero-sub">Free Fire Bundle Preview</p>
+  </header>
 
-    <div class="tabs" role="tablist" aria-label="Chọn Booyah Pass">
-      <button class="tab is-active" data-tab="t1" role="tab" aria-selected="true" aria-controls="panel-t1" type="button">
-        <span class="tab-prefix">BOOYAH</span>
-        <span class="tab-month">THÁNG 1</span>
-      </button>
-      <button class="tab" data-tab="t2" role="tab" aria-selected="false" aria-controls="panel-t2" type="button">
-        <span class="tab-prefix">BOOYAH</span>
-        <span class="tab-month">THÁNG 2</span>
-      </button>
-      <button class="tab" data-tab="t3" role="tab" aria-selected="false" aria-controls="panel-t3" type="button">
-        <span class="tab-prefix">BOOYAH</span>
-        <span class="tab-month">THÁNG 3</span>
-      </button>
+  <nav class="tabs" role="tablist">
+    <button class="tab is-active" data-tab="t1" role="tab" aria-selected="true">
+      <span class="tab-prefix">BOOYAH</span>
+      <span class="tab-month">1</span>
+    </button>
+    <button class="tab" data-tab="t2" role="tab" aria-selected="false">
+      <span class="tab-prefix">BOOYAH</span>
+      <span class="tab-month">2</span>
+    </button>
+    <button class="tab" data-tab="t3" role="tab" aria-selected="false">
+      <span class="tab-prefix">BOOYAH</span>
+      <span class="tab-month">3</span>
+    </button>
+  </nav>
+
+  <section id="panel-t1" class="panel is-active">
+    <div class="panel-title">
+      <h2>
+        <span class="title-prefix">BOOYAH</span>
+        <span class="title-month">PASS 1</span>
+      </h2>
     </div>
+    <div id="grid-t1" class="grid"></div>
+  </section>
 
-    <section class="panel is-active" id="panel-t1" role="tabpanel">
-      <header class="panel-title">
-        <h2>
-          <span class="title-prefix">THẺ BOOYAH</span>
-          <span class="title-month">THÁNG 1</span>
-        </h2>
-      </header>
-      <div class="grid" id="grid-t1"></div>
-    </section>
+  <section id="panel-t2" class="panel">
+    <div class="panel-title">
+      <h2>
+        <span class="title-prefix">BOOYAH</span>
+        <span class="title-month">PASS 2</span>
+      </h2>
+    </div>
+    <div id="grid-t2" class="grid"></div>
+  </section>
 
-    <section class="panel" id="panel-t2" role="tabpanel">
-      <header class="panel-title">
-        <h2>
-          <span class="title-prefix">THẺ BOOYAH</span>
-          <span class="title-month">THÁNG 2</span>
-        </h2>
-      </header>
-      <div class="grid" id="grid-t2"></div>
-    </section>
+  <section id="panel-t3" class="panel">
+    <div class="panel-title">
+      <h2>
+        <span class="title-prefix">BOOYAH</span>
+        <span class="title-month">PASS 3</span>
+      </h2>
+    </div>
+    <div id="grid-t3" class="grid"></div>
+  </section>
 
-    <section class="panel" id="panel-t3" role="tabpanel">
-      <header class="panel-title">
-        <h2>
-          <span class="title-prefix">THẺ BOOYAH</span>
-          <span class="title-month">THÁNG 3</span>
-        </h2>
-      </header>
-      <div class="grid" id="grid-t3"></div>
-    </section>
+  <footer class="page-footer">
+    <p class="copy"><strong>AZERST</strong> · All rights reserved</p>
+  </footer>
 
-    <footer class="page-footer">
-      <p class="copy">© 2026 <strong>AZERST</strong> — ALL RIGHTS RESERVED</p>
-    </footer>
+</main>
 
-  </main>
-
-  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal-inner">
-      <button class="modal-close" id="modalClose" type="button" aria-label="Đóng">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="modal-inner">
+    <button id="modalClose" class="modal-close" aria-label="Đóng">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="modal-brand"><div class="modal-brand-name">AZERST</div></div>
+    <div id="modalMedia" class="modal-media">
+      <img id="modalImg" alt="AZERST" draggable="false" />
+      <div class="pending">Đang cập nhật</div>
+    </div>
+    <div class="modal-footer">
+      <button id="modalDl" class="modal-dl">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12M6 11l6 6 6-6M5 21h14"/></svg>
+        Tải ảnh
       </button>
-      <div class="modal-brand">
-        <span class="modal-brand-name">AZERST</span>
-      </div>
-      <div class="modal-media" id="modalMedia">
-        <img id="modalImg" src="" alt="AZERST" draggable="false" />
-        <div class="pending">Đang cập nhật</div>
-      </div>
-      <div class="modal-footer">
-        <button class="modal-dl" id="modalDl" type="button" aria-label="Tải xuống">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M6 11l6 6 6-6M5 21h14"/></svg>
-          Tải xuống
-        </button>
-      </div>
     </div>
   </div>
+</div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <div class="guard-overlay" id="guardOverlay" role="alertdialog" aria-modal="true" aria-hidden="true">
-    <div class="guard-card">
-      <div class="guard-icon">!</div>
-      <h2 class="guard-title">PHÁT HIỆN TRUY CẬP TRÁI PHÉP</h2>
-      <p class="guard-desc">Bạn đang cố mở công cụ nhà phát triển.</p>
-      <div class="guard-countdown" id="guardCountdown">4</div>
-      <p class="guard-note">Trang sẽ tự động tải lại sau 4 giây</p>
-    </div>
+<div id="guardOverlay" class="guard-overlay" aria-hidden="true">
+  <div class="guard-card">
+    <div class="guard-icon">!</div>
+    <div class="guard-title">Phát hiện truy cập trái phép</div>
+    <div class="guard-desc">Trang sẽ tự động tải lại sau</div>
+    <div id="guardCountdown" class="guard-countdown">4</div>
+    <div class="guard-note">Vui lòng không mở DevTools</div>
   </div>
+</div>
 
-  <script src="./assets/script.js" defer></script>
-  <script src="./assets/guard.js" defer></script>
-
+<script src="security.js"></script>
+<script src="guard.js"></script>
+<script src="script.js"></script>
 </body>
-</html>
+</html></html>
