@@ -47,7 +47,7 @@ function buildUrl(bp, file) {
   if (CFG.overrides && CFG.overrides[overrideKey]) return CFG.overrides[overrideKey];
   const isDir = /^subtype7_|^BP_Premium_title_|^BP_GRANDPrize/.test(file);
   const domain = isDir
-    ? (CFG.domainDir  || 'https://dl.dir.freefiremobile.com')
+    ? (CFG.domainDir || 'https://dl.dir.freefiremobile.com')
     : (CFG.domainFile || 'https://dl-tata.freefireind.in');
   const path = CFG.path || 'common/OB56/CSH';
   return domain + '/' + path + '/' + bp + '/' + file;
@@ -77,18 +77,18 @@ function verifyImage(url) {
     const img = new Image();
     let done = false;
     const finish = ok => { if (done) return; done = true; resolve(ok); };
-    img.onload  = () => finish(true);
+    img.onload = () => finish(true);
     img.onerror = () => finish(false);
     img.src = url;
     setTimeout(() => finish(false), 8000);
   });
 }
 
-const modal      = document.getElementById('modal');
+const modal = document.getElementById('modal');
 const modalClose = document.getElementById('modalClose');
 const modalMedia = document.getElementById('modalMedia');
-const modalImg   = document.getElementById('modalImg');
-const modalDl    = document.getElementById('modalDl');
+const modalImg = document.getElementById('modalImg');
+const modalDl = document.getElementById('modalDl');
 
 let currentUrl = '';
 let currentFilename = '';
@@ -105,15 +105,10 @@ function renderGrid(gridEl, bp, files) {
         </div>
         <div class="item-actions">
           <button type="button" class="btn-action btn-view" data-url="${url}" data-filename="${file}" aria-label="Xem ảnh">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>Xem
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>Xem
           </button>
           <button type="button" class="btn-action btn-dl" data-url="${url}" data-filename="${file}" aria-label="Tải ảnh">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 3v12M6 11l6 6 6-6M5 21h14"/>
-            </svg>Tải
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M6 11l6 6 6-6M5 21h14"/></svg>Tải
           </button>
         </div>
       </article>
@@ -198,7 +193,6 @@ async function downloadFile(url, origFilename, btn) {
     if (btn) btn.classList.remove('is-loading');
     return;
   } catch (err) {}
-
   const exists = await verifyImage(url);
   if (btn) btn.classList.remove('is-loading');
   if (!exists) {
