@@ -1,8 +1,5 @@
 'use strict';
 
-/* =========================================================
-   CONFIG — đọc từ localStorage (admin/ ghi vào)
-========================================================= */
 const STORAGE_KEY = 'azerst_config';
 
 const DEFAULT_BP104 = [
@@ -41,16 +38,13 @@ function readAdminConfig() {
 
 const CFG = readAdminConfig() || {};
 
-const BP104 = (CFG.files && Array.isArray(CFG.files.BP104) && CFG.files.BP104.length)
+const BP104 = (CFG.files && Array.isArray(CFG.files.BP104))
   ? CFG.files.BP104 : DEFAULT_BP104;
-const BP105 = (CFG.files && Array.isArray(CFG.files.BP105) && CFG.files.BP105.length)
+const BP105 = (CFG.files && Array.isArray(CFG.files.BP105))
   ? CFG.files.BP105 : DEFAULT_BP105;
-const BP106 = (CFG.files && Array.isArray(CFG.files.BP106) && CFG.files.BP106.length)
+const BP106 = (CFG.files && Array.isArray(CFG.files.BP106))
   ? CFG.files.BP106 : DEFAULT_BP106;
 
-/* =========================================================
-   BUILD URLs
-========================================================= */
 function buildUrl(bp, file) {
   const overrideKey = bp + '/' + file;
   if (CFG.overrides && CFG.overrides[overrideKey]) {
@@ -64,18 +58,12 @@ function buildUrl(bp, file) {
   return domain + '/' + path + '/' + bp + '/' + file;
 }
 
-/* =========================================================
-   FILENAME → Azerst.ext
-========================================================= */
 function getAzerstFilename(origName) {
   const m = /\.(png|jpg|jpeg|webp|gif)$/i.exec(origName || '');
   const ext = m ? m[1].toLowerCase() : 'png';
   return 'Azerst.' + ext;
 }
 
-/* =========================================================
-   TOAST
-========================================================= */
 const toastEl = document.getElementById('toast');
 let toastTimer = null;
 
@@ -89,9 +77,6 @@ function showToast(message, type) {
   toastTimer = setTimeout(() => toastEl.classList.remove('is-show'), 2600);
 }
 
-/* =========================================================
-   VERIFY IMAGE
-========================================================= */
 function verifyImage(url) {
   return new Promise(resolve => {
     const img = new Image();
@@ -104,9 +89,6 @@ function verifyImage(url) {
   });
 }
 
-/* =========================================================
-   MODAL DOM
-========================================================= */
 const modal      = document.getElementById('modal');
 const modalClose = document.getElementById('modalClose');
 const modalMedia = document.getElementById('modalMedia');
@@ -116,9 +98,6 @@ const modalDl    = document.getElementById('modalDl');
 let currentUrl = '';
 let currentFilename = '';
 
-/* =========================================================
-   RENDER GRID
-========================================================= */
 function renderGrid(gridEl, bp, files) {
   if (!gridEl) return;
   gridEl.innerHTML = files.map(file => {
@@ -172,9 +151,6 @@ document.addEventListener('error', e => {
   }
 }, true);
 
-/* =========================================================
-   TABS
-========================================================= */
 (function initTabs(){
   const tabs = document.querySelectorAll('.tab');
   const panels = {
@@ -198,16 +174,10 @@ document.addEventListener('error', e => {
   });
 })();
 
-/* =========================================================
-   HELPERS
-========================================================= */
 function findMediaByUrl(url) {
   return [...document.querySelectorAll('.item-media')].find(m => m.dataset.url === url);
 }
 
-/* =========================================================
-   DOWNLOAD
-========================================================= */
 async function downloadFile(url, origFilename, btn) {
   const media = findMediaByUrl(url);
   if (media && media.classList.contains('is-error')) {
@@ -234,9 +204,7 @@ async function downloadFile(url, origFilename, btn) {
     showToast('Đã tải xuống: ' + saveName, 'success');
     if (btn) btn.classList.remove('is-loading');
     return;
-  } catch (err) {
-    /* fallback */
-  }
+  } catch (err) {}
 
   const exists = await verifyImage(url);
   if (btn) btn.classList.remove('is-loading');
@@ -251,9 +219,6 @@ async function downloadFile(url, origFilename, btn) {
   showToast('Không thể tải ảnh. Vui lòng thử lại sau', 'error');
 }
 
-/* =========================================================
-   MODAL
-========================================================= */
 async function loadImageSafely(url, imgEl, mediaEl) {
   if (imgEl.dataset.blobUrl) {
     try { URL.revokeObjectURL(imgEl.dataset.blobUrl); } catch (e) {}
@@ -275,9 +240,7 @@ async function loadImageSafely(url, imgEl, mediaEl) {
     }
     mediaEl.classList.add('is-error');
     return;
-  } catch (err) {
-    /* fallback */
-  }
+  } catch (err) {}
 
   imgEl.src = url;
   imgEl.alt = 'AZERST';
@@ -341,9 +304,6 @@ window.addEventListener('popstate', () => {
   }
 });
 
-/* =========================================================
-   EVENTS
-========================================================= */
 document.addEventListener('click', e => {
   const trigger = e.target.closest('.btn-view, .item-media');
   if (!trigger) return;
