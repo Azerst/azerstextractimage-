@@ -38,18 +38,13 @@ function readAdminConfig() {
 
 const CFG = readAdminConfig() || {};
 
-const BP104 = (CFG.files && Array.isArray(CFG.files.BP104))
-  ? CFG.files.BP104 : DEFAULT_BP104;
-const BP105 = (CFG.files && Array.isArray(CFG.files.BP105))
-  ? CFG.files.BP105 : DEFAULT_BP105;
-const BP106 = (CFG.files && Array.isArray(CFG.files.BP106))
-  ? CFG.files.BP106 : DEFAULT_BP106;
+const BP104 = (CFG.files && Array.isArray(CFG.files.BP104)) ? CFG.files.BP104 : DEFAULT_BP104;
+const BP105 = (CFG.files && Array.isArray(CFG.files.BP105)) ? CFG.files.BP105 : DEFAULT_BP105;
+const BP106 = (CFG.files && Array.isArray(CFG.files.BP106)) ? CFG.files.BP106 : DEFAULT_BP106;
 
 function buildUrl(bp, file) {
   const overrideKey = bp + '/' + file;
-  if (CFG.overrides && CFG.overrides[overrideKey]) {
-    return CFG.overrides[overrideKey];
-  }
+  if (CFG.overrides && CFG.overrides[overrideKey]) return CFG.overrides[overrideKey];
   const isDir = /^subtype7_|^BP_Premium_title_|^BP_GRANDPrize/.test(file);
   const domain = isDir
     ? (CFG.domainDir  || 'https://dl.dir.freefiremobile.com')
@@ -184,10 +179,8 @@ async function downloadFile(url, origFilename, btn) {
     showToast('Ảnh chưa cập nhật, vui lòng thử lại sau', 'warning');
     return;
   }
-
   if (btn) btn.classList.add('is-loading');
   const saveName = getAzerstFilename(origFilename);
-
   try {
     const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -208,14 +201,12 @@ async function downloadFile(url, origFilename, btn) {
 
   const exists = await verifyImage(url);
   if (btn) btn.classList.remove('is-loading');
-
   if (!exists) {
     if (media) media.classList.add('is-error');
     if (currentUrl === url && modalMedia) modalMedia.classList.add('is-error');
     showToast('Ảnh chưa cập nhật, vui lòng thử lại sau', 'warning');
     return;
   }
-
   showToast('Không thể tải ảnh. Vui lòng thử lại sau', 'error');
 }
 
@@ -224,10 +215,8 @@ async function loadImageSafely(url, imgEl, mediaEl) {
     try { URL.revokeObjectURL(imgEl.dataset.blobUrl); } catch (e) {}
     delete imgEl.dataset.blobUrl;
   }
-
   mediaEl.classList.remove('is-error');
   imgEl.onerror = () => mediaEl.classList.add('is-error');
-
   try {
     const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
     if (res.ok) {
@@ -241,7 +230,6 @@ async function loadImageSafely(url, imgEl, mediaEl) {
     mediaEl.classList.add('is-error');
     return;
   } catch (err) {}
-
   imgEl.src = url;
   imgEl.alt = 'AZERST';
 }
@@ -250,21 +238,17 @@ async function openModal(url, filename) {
   currentUrl = url;
   currentFilename = filename;
   modalMedia.classList.remove('is-error');
-
   if (!history.state || !history.state.azerModal) {
     try { history.pushState({ azerModal: true }, '', '#azer-image'); } catch (e) {}
   }
-
   modal.classList.add('is-open');
   modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
-
   const media = findMediaByUrl(url);
   if (media && media.classList.contains('is-error')) {
     modalMedia.classList.add('is-error');
     return;
   }
-
   await loadImageSafely(url, modalImg, modalMedia);
 }
 
@@ -273,7 +257,6 @@ function closeModal() {
   modal.classList.remove('is-open');
   modal.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
-
   setTimeout(() => {
     if (modalImg.dataset.blobUrl) {
       try { URL.revokeObjectURL(modalImg.dataset.blobUrl); } catch (e) {}
@@ -282,7 +265,6 @@ function closeModal() {
     modalImg.src = '';
     modalMedia.classList.remove('is-error');
   }, 350);
-
   if (wasOpen && history.state && history.state.azerModal) {
     try { history.back(); } catch (e) {}
   }
