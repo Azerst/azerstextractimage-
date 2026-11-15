@@ -4,16 +4,9 @@
   console.log('[Admin] Script loaded');
 
   var isInIframe = false;
-  try {
-    isInIframe = window.top !== window.self;
-  } catch (e) {
-    isInIframe = true;
-  }
-
+  try { isInIframe = window.top !== window.self; } catch (e) { isInIframe = true; }
   if (isInIframe) {
-    try {
-      window.top.location = window.self.location.href;
-    } catch (e) {}
+    try { window.top.location = window.self.location.href; } catch (e) {}
     document.body.innerHTML =
       '<div style="min-height:100vh;display:grid;place-items:center;background:#070a14;color:#ff5a46;font-family:system-ui,sans-serif;text-align:center;padding:24px;">' +
       '<div><h1 style="font-size:56px;font-weight:900;margin-bottom:16px;">&#9940;</h1>' +
@@ -35,86 +28,13 @@
     198,204,228,217,198,199,192,223,223,193,
     204,236,248,219,229,211,217,193,250,184
   ];
-
   const ACC_PLAIN  = String.fromCharCode.apply(null, ACC_ENC.map(function (c)  { return c ^ KEY; }));
   const PASS_PLAIN = String.fromCharCode.apply(null, PASS_ENC.map(function (c) { return c ^ KEY; }));
 
   const CFG_KEY     = 'azerst_config';
   const SESSION_KEY = 'azerst_admin_session';
   const LOCK_KEY    = 'azerst_admin_lock';
-
   const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
-  var lastActivityAt = Date.now();
-  var idleTimer = null;
-
-  function touchActivity() { lastActivityAt = Date.now(); }
-
-  function startIdleMonitor() {
-    stopIdleMonitor();
-    lastActivityAt = Date.now();
-    idleTimer = setInterval(function () {
-      if (!dom.adminScreen || dom.adminScreen.hidden) return;
-      if (Date.now() - lastActivityAt > SESSION_TIMEOUT_MS) {
-        logout();
-        toast('Phiên hết hạn do không hoạt động', 'warning');
-      }
-    }, 30000);
-  }
-
-  function stopIdleMonitor() {
-    if (idleTimer) { clearInterval(idleTimer); idleTimer = null; }
-  }
-
-  ['mousemove','keydown','click','touchstart','scroll'].forEach(function (evt) {
-    document.addEventListener(evt, touchActivity, { passive: true });
-  });
-
-  function getLockData() {
-    try {
-      var raw = localStorage.getItem(LOCK_KEY);
-      if (!raw) return { attempts: 0, until: 0 };
-      var d = JSON.parse(raw);
-      return { attempts: Number(d.attempts) || 0, until: Number(d.until) || 0 };
-    } catch (e) {
-      return { attempts: 0, until: 0 };
-    }
-  }
-
-  function saveLockData(d) {
-    try { localStorage.setItem(LOCK_KEY, JSON.stringify(d)); } catch (e) {}
-  }
-
-  function resetLockData() {
-    try { localStorage.removeItem(LOCK_KEY); } catch (e) {}
-  }
-
-  function getLockRemaining() {
-    var d = getLockData();
-    if (!d.until) return 0;
-    var remaining = Math.ceil((d.until - Date.now()) / 1000);
-    if (remaining <= 0) {
-      saveLockData({ attempts: 0, until: 0 });
-      return 0;
-    }
-    return remaining;
-  }
-
-  function recordFailedAttempt() {
-    var d = getLockData();
-    var attempts = d.attempts + 1;
-    if (attempts >= 5) {
-      saveLockData({ attempts: 0, until: Date.now() + 60000 });
-      return { locked: true, remaining: 60 };
-    }
-    saveLockData({ attempts: attempts, until: 0 });
-    return { locked: false, attempts: attempts, remaining: 0 };
-  }
-
-  ['drop', 'dragover', 'dragenter'].forEach(function (evt) {
-    document.addEventListener(evt, function (e) {
-      e.preventDefault();
-    }, true);
-  });
 
   const DEFAULT_FILES = {
     BP104: [
@@ -144,13 +64,30 @@
   };
   const BP_KEYS = ['BP104', 'BP105', 'BP106'];
 
-  var state = {
-    fileEdits: {},
-    activeBp: 'BP104'
+  const DEFAULT_CFG = {
+    domainFile: 'https://dl-tata.freefireind.in',
+    domainDir:  'https://dl.dir.freefiremobile.com',
+    path:       'common/OB56/CSH'
   };
 
+  var state = { cfg: null, activeBp: 'BP104' };
   var dom = {};
   function $(id) { return document.getElementById(id); }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+    });
+  }
+
+  function debounce(fn, ms) {
+    var t;
+    return function () {
+      var args = arguments, ctx = this;
+      clearTimeout(t);
+      t = setTimeout(function () { fn.apply(ctx, args); }, ms);
+    };
+  }
 
   var toastTimer = null;
   function toast(msg, type) {
@@ -169,13 +106,75 @@
     el.className = 'status ' + (type || '');
   }
 
-  function debounce(fn, ms) {
-    var t;
-    return function () {
-      var args = arguments, ctx = this;
-      clearTimeout(t);
-      t = setTimeout(function () { fn.apply(ctx, args); }, ms);
+  function cloneDefault() {
+    return {
+      domainFile: DEFAULT_CFG.domainFile,
+      domainDir:  DEFAULT_CFG.domainDir,
+      path:       DEFAULT_CFG.path,
+      files: {
+        BP104: DEFAULT_FILES.BP104.slice(),
+        BP105: DEFAULT_FILES.BP105.slice(),
+        BP106: DEFAULT_FILES.BP106.slice()
+      },
+      overrides: {}
     };
+  }
+
+  function buildDefaultUrl(bp, file) {
+    if (!file) return '';
+    var cfg = state.cfg;
+    var isDir = /^subtype7_|^BP_Premium_title_|^BP_GRANDPrize/.test(file);
+    var domain = isDir ? cfg.domainDir : cfg.domainFile;
+    return domain + '/' + cfg.path + '/' + bp + '/' + file;
+  }
+
+  function buildEffectiveUrl(bp, file) {
+    var key = bp + '/' + file;
+    return (state.cfg.overrides && state.cfg.overrides[key]) || buildDefaultUrl(bp, file);
+  }
+
+  function loadCfgFromStorage() {
+    try {
+      var raw = localStorage.getItem(CFG_KEY);
+      if (!raw) return cloneDefault();
+      var d = JSON.parse(raw);
+      if (!d || typeof d !== 'object') return cloneDefault();
+      var cfg = cloneDefault();
+      if (typeof d.domainFile === 'string') cfg.domainFile = d.domainFile;
+      if (typeof d.domainDir  === 'string') cfg.domainDir  = d.domainDir;
+      if (typeof d.path       === 'string') cfg.path       = d.path;
+      if (d.files && typeof d.files === 'object') {
+        BP_KEYS.forEach(function (bp) {
+          if (Array.isArray(d.files[bp])) {
+            cfg.files[bp] = d.files[bp].filter(function (x) { return typeof x === 'string'; });
+          }
+        });
+      }
+      if (d.overrides && typeof d.overrides === 'object') {
+        cfg.overrides = {};
+        Object.keys(d.overrides).forEach(function (k) {
+          if (typeof d.overrides[k] === 'string') cfg.overrides[k] = d.overrides[k];
+        });
+      }
+      return cfg;
+    } catch (e) { return cloneDefault(); }
+  }
+
+  function saveCfgToStorage(cfg) {
+    try {
+      localStorage.setItem(CFG_KEY, JSON.stringify({
+        domainFile: cfg.domainFile,
+        domainDir:  cfg.domainDir,
+        path:       cfg.path,
+        files:      cfg.files,
+        overrides:  cfg.overrides,
+        updatedAt:  Date.now()
+      }));
+      return true;
+    } catch (e) {
+      toast('Không lưu được', 'error');
+      return false;
+    }
   }
 
   function checkCreds(user, pass) {
@@ -188,6 +187,36 @@
     return diff === 0;
   }
 
+  function getLockData() {
+    try {
+      var raw = localStorage.getItem(LOCK_KEY);
+      if (!raw) return { attempts: 0, until: 0 };
+      var d = JSON.parse(raw);
+      return { attempts: Number(d.attempts) || 0, until: Number(d.until) || 0 };
+    } catch (e) { return { attempts: 0, until: 0 }; }
+  }
+  function saveLockData(d) { try { localStorage.setItem(LOCK_KEY, JSON.stringify(d)); } catch (e) {} }
+  function resetLockData() { try { localStorage.removeItem(LOCK_KEY); } catch (e) {} }
+
+  function getLockRemaining() {
+    var d = getLockData();
+    if (!d.until) return 0;
+    var r = Math.ceil((d.until - Date.now()) / 1000);
+    if (r <= 0) { saveLockData({ attempts: 0, until: 0 }); return 0; }
+    return r;
+  }
+
+  function recordFailedAttempt() {
+    var d = getLockData();
+    var attempts = d.attempts + 1;
+    if (attempts >= 5) {
+      saveLockData({ attempts: 0, until: Date.now() + 60000 });
+      return { locked: true, attempts: 0 };
+    }
+    saveLockData({ attempts: attempts, until: 0 });
+    return { locked: false, attempts: attempts };
+  }
+
   function showLoginError(msg) {
     if (!dom.loginError) return;
     dom.loginError.textContent = msg;
@@ -196,41 +225,31 @@
     void dom.loginError.offsetWidth;
     dom.loginError.style.animation = '';
   }
-
-  function clearLoginError() {
-    if (dom.loginError) dom.loginError.hidden = true;
-  }
+  function clearLoginError() { if (dom.loginError) dom.loginError.hidden = true; }
 
   function handleLogin(e) {
     e.preventDefault();
-
     var remaining = getLockRemaining();
     if (remaining > 0) {
       showLoginError('Đã khóa. Vui lòng thử lại sau ' + remaining + 's.');
       return;
     }
-
     var user = dom.loginUser.value.trim();
     var pass = dom.loginPass.value;
     if (!user || !pass) {
       showLoginError('Vui lòng nhập đầy đủ tài khoản và mật khẩu.');
       return;
     }
-
     if (checkCreds(user, pass)) {
       try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (err) {}
       resetLockData();
+      clearLoginError();
       showAdmin();
       toast('Đăng nhập thành công', 'success');
-      console.log('[Admin] Login OK');
     } else {
       var result = recordFailedAttempt();
-      console.log('[Admin] Login failed, attempt:', result.attempts, 'locked:', result.locked);
-      if (result.locked) {
-        showLoginError('Sai quá 5 lần. Đã khóa 60 giây.');
-      } else {
-        showLoginError('Sai tài khoản hoặc mật khẩu (' + result.attempts + '/5).');
-      }
+      if (result.locked) showLoginError('Sai quá 5 lần. Đã khóa 60 giây.');
+      else showLoginError('Sai tài khoản hoặc mật khẩu (' + result.attempts + '/5).');
     }
   }
 
@@ -245,101 +264,162 @@
     toast('Đã đăng xuất', 'info');
   }
 
-  function loadConfig() {
-    try {
-      var raw = localStorage.getItem(CFG_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) { return null; }
+  var lastActivityAt = Date.now();
+  var idleTimer = null;
+  function touchActivity() { lastActivityAt = Date.now(); }
+  ['mousemove','keydown','click','touchstart','scroll'].forEach(function (evt) {
+    document.addEventListener(evt, touchActivity, { passive: true });
+  });
+  function startIdleMonitor() {
+    stopIdleMonitor();
+    lastActivityAt = Date.now();
+    idleTimer = setInterval(function () {
+      if (!dom.adminScreen || dom.adminScreen.hidden) return;
+      if (Date.now() - lastActivityAt > SESSION_TIMEOUT_MS) {
+        logout();
+        toast('Phiên hết hạn do không hoạt động', 'warning');
+      }
+    }, 30000);
+  }
+  function stopIdleMonitor() { if (idleTimer) { clearInterval(idleTimer); idleTimer = null; } }
+
+  function renderSettings() {
+    dom.cfgDomainFile.value = state.cfg.domainFile;
+    dom.cfgDomainDir.value  = state.cfg.domainDir;
+    dom.cfgPath.value       = state.cfg.path;
   }
 
-  function saveConfig(cfg) {
-    try {
-      localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
-      return true;
-    } catch (e) {
-      toast('Không lưu được cấu hình', 'error');
-      return false;
+  function renderTabs() {
+    dom.tabs.forEach(function (tab) {
+      var active = tab.dataset.bp === state.activeBp;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+  }
+
+  function renderImageGrid() {
+    var bp = state.activeBp;
+    var files = state.cfg.files[bp] || [];
+    var grid = dom.imageGrid;
+    dom.imageCount.textContent = files.length + ' ảnh';
+
+    if (!files.length) {
+      grid.innerHTML = '<div class="empty-state">Chưa có ảnh. Bấm "+ Thêm ảnh" để tạo.</div>';
+      return;
+    }
+
+    grid.innerHTML = files.map(function (file, index) {
+      var isNew = !file;
+      var effectiveUrl = isNew ? '' : buildEffectiveUrl(bp, file);
+      var overrideUrl = isNew ? '' : (state.cfg.overrides[bp + '/' + file] || '');
+
+      return (
+        '<div class="image-card" data-index="' + index + '">' +
+          '<button type="button" class="image-remove" title="Xóa">×</button>' +
+          '<div class="image-preview">' +
+            (effectiveUrl ? '<img src="' + escapeHtml(effectiveUrl) + '" alt="" loading="lazy">' : '') +
+            '<div class="preview-error">' + (isNew ? 'Nhập tên file' : 'Lỗi tải ảnh') + '</div>' +
+          '</div>' +
+          '<div class="image-info">' +
+            (isNew
+              ? '<input class="image-filename-input" type="text" placeholder="Tên file..." autofocus>'
+              : '<div class="image-filename" title="' + escapeHtml(file) + '">' + escapeHtml(file) + '</div>'
+            ) +
+            '<input class="image-url" type="url" value="' + escapeHtml(overrideUrl) + '" placeholder="' + (isNew ? 'URL tùy chỉnh...' : 'Trống = mặc định') + '" ' + (isNew ? 'disabled' : '') + '>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+
+    var newInput = grid.querySelector('.image-filename-input');
+    if (newInput) setTimeout(function () { newInput.focus(); }, 30);
+  }
+
+  function updatePreviewCard(card, bp, file) {
+    var img = card.querySelector('img');
+    var preview = card.querySelector('.image-preview');
+    var url = buildEffectiveUrl(bp, file);
+    if (!url) return;
+    if (!img) {
+      img = document.createElement('img');
+      img.alt = '';
+      img.loading = 'lazy';
+      preview.insertBefore(img, preview.firstChild);
+    }
+    preview.classList.remove('is-error');
+    img.src = url;
+  }
+
+  function onGridInput(e) {
+    var target = e.target;
+    var card = target.closest('.image-card');
+    if (!card) return;
+    var i = Number(card.dataset.index);
+    var bp = state.activeBp;
+    var file = state.cfg.files[bp][i];
+    if (!file) return;
+    if (target.classList.contains('image-url')) {
+      var key = bp + '/' + file;
+      var url = target.value.trim();
+      if (url) state.cfg.overrides[key] = url;
+      else delete state.cfg.overrides[key];
+      updatePreviewCard(card, bp, file);
     }
   }
 
-  function fillFormFromConfig() {
-    var cfg = loadConfig() || {};
-    dom.cfgDomainFile.value = cfg.domainFile || 'https://dl-tata.freefireind.in';
-    dom.cfgDomainDir.value  = cfg.domainDir  || 'https://dl.dir.freefiremobile.com';
-    dom.cfgPath.value       = cfg.path       || 'common/OB56/CSH';
-
-    BP_KEYS.forEach(function (bp) {
-      var arr = (cfg.files && Array.isArray(cfg.files[bp])) ? cfg.files[bp] : DEFAULT_FILES[bp];
-      state.fileEdits[bp] = arr.slice();
-    });
-
-    state.activeBp = 'BP104';
-    setActiveTab('BP104');
-    renderFileEditor();
-
-    var ov = cfg.overrides || {};
-    dom.cfgOverrides.value = Object.keys(ov)
-      .map(function (k) { return k + '=' + ov[k]; })
-      .join('\n');
-
-    var stamp = cfg.updatedAt
-      ? ' (cập nhật: ' + new Date(cfg.updatedAt).toLocaleString() + ')'
-      : ' (mặc định)';
-    setStatus('Đã nạp cấu hình' + stamp);
+  function onGridChange(e) {
+    var target = e.target;
+    var card = target.closest('.image-card');
+    if (!card) return;
+    var i = Number(card.dataset.index);
+    var bp = state.activeBp;
+    if (target.classList.contains('image-filename-input')) {
+      var newFile = target.value.trim();
+      if (!newFile) {
+        state.cfg.files[bp].splice(i, 1);
+        renderImageGrid();
+        return;
+      }
+      state.cfg.files[bp][i] = newFile;
+      renderImageGrid();
+    }
   }
 
-  function setActiveTab(bp) {
-    state.activeBp = bp;
-    dom.fileTabs.forEach(function (btn) {
-      btn.classList.toggle('is-active', btn.dataset.bp === bp);
-    });
+  function onGridClick(e) {
+    var target = e.target;
+    var card = target.closest('.image-card');
+    if (!card) return;
+    var i = Number(card.dataset.index);
+    var bp = state.activeBp;
+    if (target.classList.contains('image-remove')) {
+      var file = state.cfg.files[bp][i];
+      if (!confirm('Xóa ảnh "' + (file || '?') + '"?')) return;
+      state.cfg.files[bp].splice(i, 1);
+      if (file) delete state.cfg.overrides[bp + '/' + file];
+      renderImageGrid();
+    }
   }
 
-  function renderFileEditor() {
-    var arr = state.fileEdits[state.activeBp] || [];
-    dom.fileListEditor.value = arr.join('\n');
-    dom.fileCount.textContent = arr.length + ' file';
+  function onGridError(e) {
+    if (e.target && e.target.tagName === 'IMG') {
+      var preview = e.target.closest('.image-preview');
+      if (preview) preview.classList.add('is-error');
+    }
   }
 
-  function syncEditorToState() {
-    var lines = dom.fileListEditor.value.split('\n')
-      .map(function (l) { return l.trim(); })
-      .filter(Boolean);
-    state.fileEdits[state.activeBp] = lines;
-    dom.fileCount.textContent = lines.length + ' file';
-  }
-
-  function onTabClick(bp) {
-    syncEditorToState();
-    setActiveTab(bp);
-    renderFileEditor();
-  }
-
-  function collectConfigFromForm() {
-    syncEditorToState();
-    var overrides = {};
-    dom.cfgOverrides.value.split('\n').forEach(function (line) {
-      var t = line.trim();
-      if (!t || t.charAt(0) === '#') return;
-      var i = t.indexOf('=');
-      if (i === -1) return;
-      var k = t.slice(0, i).trim();
-      var v = t.slice(i + 1).trim();
-      if (k && v) overrides[k] = v;
-    });
-    return {
-      domainFile: dom.cfgDomainFile.value.trim() || undefined,
-      domainDir : dom.cfgDomainDir.value.trim()  || undefined,
-      path      : dom.cfgPath.value.trim()       || undefined,
-      files     : JSON.parse(JSON.stringify(state.fileEdits)),
-      overrides : Object.keys(overrides).length ? overrides : undefined,
-      updatedAt : Date.now()
-    };
+  function handleAddImage() {
+    state.cfg.files[state.activeBp].push('');
+    renderImageGrid();
   }
 
   function handleSave() {
-    var cfg = collectConfigFromForm();
-    if (saveConfig(cfg)) {
+    BP_KEYS.forEach(function (bp) {
+      state.cfg.files[bp] = state.cfg.files[bp]
+        .map(function (f) { return (f || '').trim(); })
+        .filter(Boolean);
+    });
+    if (saveCfgToStorage(state.cfg)) {
+      renderImageGrid();
       toast('Đã lưu cấu hình', 'success');
       setStatus('Đã lưu lúc ' + new Date().toLocaleTimeString(), 'ok');
     }
@@ -348,23 +428,34 @@
   function handleReset() {
     if (!confirm('Reset toàn bộ cấu hình về mặc định?')) return;
     try { localStorage.removeItem(CFG_KEY); } catch (e) {}
-    fillFormFromConfig();
-    toast('Đã reset về mặc định', 'warning');
+    state.cfg = cloneDefault();
+    state.activeBp = 'BP104';
+    renderSettings();
+    renderTabs();
+    renderImageGrid();
+    toast('Đã reset', 'warning');
     setStatus('Đã reset về mặc định');
   }
 
   function handleExport() {
-    var cfg = collectConfigFromForm();
+    var cfg = {
+      domainFile: state.cfg.domainFile,
+      domainDir:  state.cfg.domainDir,
+      path:       state.cfg.path,
+      files:      state.cfg.files,
+      overrides:  state.cfg.overrides,
+      updatedAt:  Date.now()
+    };
     var blob = new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' });
-    var url  = URL.createObjectURL(blob);
-    var a    = document.createElement('a');
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
     a.href = url;
     a.download = 'azerst-config-' + Date.now() + '.json';
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 3000);
-    toast('Đã export cấu hình', 'success');
+    toast('Đã export', 'success');
   }
 
   function handleImport(file) {
@@ -372,12 +463,30 @@
     var reader = new FileReader();
     reader.onload = function (e) {
       try {
-        var cfg = JSON.parse(e.target.result);
-        if (!cfg || typeof cfg !== 'object') throw new Error('Invalid');
-        if (!saveConfig(cfg)) return;
-        fillFormFromConfig();
-        toast('Đã import cấu hình', 'success');
-        setStatus('Đã import cấu hình', 'ok');
+        var d = JSON.parse(e.target.result);
+        if (!d || typeof d !== 'object') throw new Error('Invalid');
+        var cfg = cloneDefault();
+        if (typeof d.domainFile === 'string') cfg.domainFile = d.domainFile;
+        if (typeof d.domainDir  === 'string') cfg.domainDir  = d.domainDir;
+        if (typeof d.path       === 'string') cfg.path       = d.path;
+        if (d.files && typeof d.files === 'object') {
+          BP_KEYS.forEach(function (bp) {
+            if (Array.isArray(d.files[bp])) {
+              cfg.files[bp] = d.files[bp].filter(function (x) { return typeof x === 'string' && x.trim(); });
+            }
+          });
+        }
+        if (d.overrides && typeof d.overrides === 'object') {
+          Object.keys(d.overrides).forEach(function (k) {
+            if (typeof d.overrides[k] === 'string') cfg.overrides[k] = d.overrides[k];
+          });
+        }
+        state.cfg = cfg;
+        renderSettings();
+        renderTabs();
+        renderImageGrid();
+        toast('Đã import', 'success');
+        setStatus('Đã import lúc ' + new Date().toLocaleTimeString(), 'ok');
       } catch (err) {
         toast('File JSON không hợp lệ', 'error');
       }
@@ -385,10 +494,30 @@
     reader.readAsText(file);
   }
 
+  function onSettingsChange() {
+    state.cfg.domainFile = dom.cfgDomainFile.value.trim() || DEFAULT_CFG.domainFile;
+    state.cfg.domainDir  = dom.cfgDomainDir.value.trim()  || DEFAULT_CFG.domainDir;
+    state.cfg.path       = dom.cfgPath.value.trim()       || DEFAULT_CFG.path;
+    var cards = dom.imageGrid.querySelectorAll('.image-card');
+    cards.forEach(function (card) {
+      var i = Number(card.dataset.index);
+      var file = state.cfg.files[state.activeBp][i];
+      if (!file) return;
+      var key = state.activeBp + '/' + file;
+      if (state.cfg.overrides[key]) return;
+      updatePreviewCard(card, state.activeBp, file);
+    });
+  }
+
   function showAdmin() {
     dom.loginScreen.hidden = true;
     dom.adminScreen.hidden = false;
-    fillFormFromConfig();
+    state.cfg = loadCfgFromStorage();
+    state.activeBp = 'BP104';
+    renderSettings();
+    renderTabs();
+    renderImageGrid();
+    setStatus('Đã nạp cấu hình');
     startIdleMonitor();
   }
 
@@ -396,10 +525,8 @@
     dom.adminScreen.hidden = true;
     dom.loginScreen.hidden = false;
     stopIdleMonitor();
-    var remaining = getLockRemaining();
-    if (remaining > 0) {
-      showLoginError('Đã khóa. Vui lòng thử lại sau ' + remaining + 's.');
-    }
+    var r = getLockRemaining();
+    if (r > 0) showLoginError('Đã khóa. Vui lòng thử lại sau ' + r + 's.');
     dom.loginUser.focus();
   }
 
@@ -417,16 +544,16 @@
       cfgDomainFile: $('cfgDomainFile'),
       cfgDomainDir:  $('cfgDomainDir'),
       cfgPath:       $('cfgPath'),
-      fileTabs:      Array.prototype.slice.call(document.querySelectorAll('.file-tab')),
-      fileListEditor: $('fileListEditor'),
-      fileCount:      $('fileCount'),
-      cfgOverrides:   $('cfgOverrides'),
-      saveBtn:        $('saveBtn'),
-      resetBtn:       $('resetBtn'),
-      exportBtn:      $('exportBtn'),
-      importInput:    $('importInput'),
-      status:         $('status'),
-      toast:          $('toast')
+      tabs:          Array.prototype.slice.call(document.querySelectorAll('.tab[data-bp]')),
+      imageGrid:     $('imageGrid'),
+      imageCount:    $('imageCount'),
+      addImageBtn:   $('addImageBtn'),
+      saveBtn:       $('saveBtn'),
+      resetBtn:      $('resetBtn'),
+      exportBtn:     $('exportBtn'),
+      importInput:   $('importInput'),
+      status:        $('status'),
+      toast:         $('toast')
     };
   }
 
@@ -442,16 +569,25 @@
 
     dom.logoutBtn.addEventListener('click', logout);
 
-    dom.fileTabs.forEach(function (btn) {
-      btn.addEventListener('click', function () { onTabClick(btn.dataset.bp); });
+    dom.tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        state.activeBp = tab.dataset.bp;
+        renderTabs();
+        renderImageGrid();
+      });
     });
 
-    dom.fileListEditor.addEventListener('input', debounce(function () {
-      var lines = dom.fileListEditor.value.split('\n')
-        .map(function (l) { return l.trim(); })
-        .filter(Boolean);
-      dom.fileCount.textContent = lines.length + ' file';
-    }, 150));
+    dom.addImageBtn.addEventListener('click', handleAddImage);
+
+    dom.imageGrid.addEventListener('input',  onGridInput);
+    dom.imageGrid.addEventListener('change', onGridChange);
+    dom.imageGrid.addEventListener('click',  onGridClick);
+    dom.imageGrid.addEventListener('error',  onGridError, true);
+
+    var settingsDebounced = debounce(onSettingsChange, 300);
+    dom.cfgDomainFile.addEventListener('input', settingsDebounced);
+    dom.cfgDomainDir.addEventListener('input',  settingsDebounced);
+    dom.cfgPath.addEventListener('input',       settingsDebounced);
 
     dom.saveBtn.addEventListener('click', handleSave);
     dom.resetBtn.addEventListener('click', handleReset);
@@ -475,26 +611,26 @@
       var isLoggedIn = sessionStorage.getItem(SESSION_KEY) === '1';
       if (!isLoggedIn && !dom.adminScreen.hidden) showLogin();
     });
+
+    ['drop','dragover','dragenter'].forEach(function (evt) {
+      document.addEventListener(evt, function (e) {
+        if (e.target !== dom.importInput) e.preventDefault();
+      }, true);
+    });
   }
 
   function init() {
     try {
       cacheDom();
       bindEvents();
-
-      if (sessionStorage.getItem(SESSION_KEY) === '1') {
-        showAdmin();
-      } else {
-        showLogin();
-      }
+      if (sessionStorage.getItem(SESSION_KEY) === '1') showAdmin();
+      else showLogin();
       console.log('[Admin] Init complete');
     } catch (err) {
       console.error('[Admin] Init failed:', err);
       document.body.innerHTML =
         '<div style="padding:40px;color:#ff5a46;font-family:monospace;background:#070a14;min-height:100vh;">' +
-        '<h1>Admin Init Error</h1>' +
-        '<pre>' + (err && err.stack ? err.stack : err) + '</pre>' +
-        '</div>';
+        '<h1>Admin Init Error</h1><pre>' + (err && err.stack ? err.stack : err) + '</pre></div>';
     }
   }
 
