@@ -1,9 +1,11 @@
 'use strict';
 
 /* =========================================================
-   DATA — 3 THÁNG
+   CONFIG — đọc từ localStorage (admin/ ghi vào)
 ========================================================= */
-const BP104 = [
+const STORAGE_KEY = 'azerst_config';
+
+const DEFAULT_BP104 = [
   'BP_Prize_104.png','BP_Task_FP_104.png','BP_104.png','BP_Window_PP_104.png',
   'BP_Premium_icon_104.png','BP_Icon_free_104.png','subtype36_104.jpg',
   'subtype1_104.jpg','subtype2_104.jpg','subtype3_104.jpg','subtype7_104.jpg',
@@ -12,7 +14,7 @@ const BP104 = [
   'BP_GRANDPrize06_104.jpg'
 ];
 
-const BP105 = [
+const DEFAULT_BP105 = [
   'BP_Prize_105.png','BP_Task_FP_105.png','BP_105.png','BP_Window_PP_105.png',
   'BP_Premium_icon_105.png','BP_Icon_free_105.png','subtype36_105.jpg',
   'subtype1_105.jpg','subtype2_105.jpg','subtype3_105.jpg','subtype7_105.jpg',
@@ -21,7 +23,7 @@ const BP105 = [
   'BP_GRANDPrize06_105.jpg','BP_GRANDPrize07_105.jpg'
 ];
 
-const BP106 = [
+const DEFAULT_BP106 = [
   'BP_Prize_106.png','BP_Task_FP_106.png','BP_106.png','BP_Window_PP_106.png',
   'BP_Premium_icon_106.png','BP_Icon_free_106.png','subtype36_106.jpg',
   'subtype1_106.jpg','subtype2_106.jpg','subtype3_106.jpg','subtype7_106.jpg',
@@ -30,15 +32,36 @@ const BP106 = [
   'BP_GRANDPrize06_106.jpg','BP_GRANDPrize07_106.jpg'
 ];
 
+function readAdminConfig() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+const CFG = readAdminConfig() || {};
+
+const BP104 = (CFG.files && Array.isArray(CFG.files.BP104) && CFG.files.BP104.length)
+  ? CFG.files.BP104 : DEFAULT_BP104;
+const BP105 = (CFG.files && Array.isArray(CFG.files.BP105) && CFG.files.BP105.length)
+  ? CFG.files.BP105 : DEFAULT_BP105;
+const BP106 = (CFG.files && Array.isArray(CFG.files.BP106) && CFG.files.BP106.length)
+  ? CFG.files.BP106 : DEFAULT_BP106;
+
 /* =========================================================
    BUILD URLs
 ========================================================= */
 function buildUrl(bp, file) {
+  const overrideKey = bp + '/' + file;
+  if (CFG.overrides && CFG.overrides[overrideKey]) {
+    return CFG.overrides[overrideKey];
+  }
   const isDir = /^subtype7_|^BP_Premium_title_|^BP_GRANDPrize/.test(file);
   const domain = isDir
-    ? 'https://dl.dir.freefiremobile.com'
-    : 'https://dl-tata.freefireind.in';
-  return `${domain}/common/OB56/CSH/${bp}/${file}`;
+    ? (CFG.domainDir  || 'https://dl.dir.freefiremobile.com')
+    : (CFG.domainFile || 'https://dl-tata.freefireind.in');
+  const path = CFG.path || 'common/OB56/CSH';
+  return domain + '/' + path + '/' + bp + '/' + file;
 }
 
 /* =========================================================
@@ -47,7 +70,7 @@ function buildUrl(bp, file) {
 function getAzerstFilename(origName) {
   const m = /\.(png|jpg|jpeg|webp|gif)$/i.exec(origName || '');
   const ext = m ? m[1].toLowerCase() : 'png';
-  return `Azerst.${ext}`;
+  return 'Azerst.' + ext;
 }
 
 /* =========================================================
@@ -56,11 +79,11 @@ function getAzerstFilename(origName) {
 const toastEl = document.getElementById('toast');
 let toastTimer = null;
 
-function showToast(message, type = 'info') {
+function showToast(message, type) {
   if (!toastEl) return;
   clearTimeout(toastTimer);
   toastEl.textContent = message;
-  toastEl.className = 'toast toast-' + type;
+  toastEl.className = 'toast toast-' + (type || 'info');
   void toastEl.offsetWidth;
   toastEl.classList.add('is-show');
   toastTimer = setTimeout(() => toastEl.classList.remove('is-show'), 2600);
@@ -82,8 +105,19 @@ function verifyImage(url) {
 }
 
 /* =========================================================
+   MODAL DOM
+========================================================= */
+const modal      = document.getElementById('modal');
+const modalClose = document.getElementById('modalClose');
+const modalMedia = document.getElementById('modalMedia');
+const modalImg   = document.getElementById('modalImg');
+const modalDl    = document.getElementById('modalDl');
+
+let currentUrl = '';
+let currentFilename = '';
+
+/* =========================================================
    RENDER GRID
-   Mỗi ảnh có draggable="false" để không kéo được
 ========================================================= */
 function renderGrid(gridEl, bp, files) {
   if (!gridEl) return;
@@ -172,7 +206,7 @@ function findMediaByUrl(url) {
 }
 
 /* =========================================================
-   DOWNLOAD — KHÔNG dùng window.open / không điều hướng
+   DOWNLOAD
 ========================================================= */
 async function downloadFile(url, origFilename, btn) {
   const media = findMediaByUrl(url);
@@ -201,7 +235,7 @@ async function downloadFile(url, origFilename, btn) {
     if (btn) btn.classList.remove('is-loading');
     return;
   } catch (err) {
-    /* fallback không dùng window.open */
+    /* fallback */
   }
 
   const exists = await verifyImage(url);
@@ -214,22 +248,12 @@ async function downloadFile(url, origFilename, btn) {
     return;
   }
 
-  /* Ảnh tồn tại nhưng bị CORS → KHÔNG mở link, chỉ thông báo */
   showToast('Không thể tải ảnh. Vui lòng thử lại sau', 'error');
 }
 
 /* =========================================================
    MODAL
 ========================================================= */
-const modal      = document.getElementById('modal');
-const modalClose = document.getElementById('modalClose');
-const modalMedia = document.getElementById('modalMedia');
-const modalImg   = document.getElementById('modalImg');
-const modalDl    = document.getElementById('modalDl');
-
-let currentUrl = '';
-let currentFilename = '';
-
 async function loadImageSafely(url, imgEl, mediaEl) {
   if (imgEl.dataset.blobUrl) {
     try { URL.revokeObjectURL(imgEl.dataset.blobUrl); } catch (e) {}
@@ -252,7 +276,7 @@ async function loadImageSafely(url, imgEl, mediaEl) {
     mediaEl.classList.add('is-error');
     return;
   } catch (err) {
-    /* fallback - vẫn dùng ảnh gốc nhưng trong modal, không chuyển trang */
+    /* fallback */
   }
 
   imgEl.src = url;
@@ -318,11 +342,8 @@ window.addEventListener('popstate', () => {
 });
 
 /* =========================================================
-   EVENTS — CHẶN MỌI HÌNH THỨC CHUYỂN TRANG
-   Dùng { capture: true } để chặn TRƯỚC mọi handler khác
+   EVENTS
 ========================================================= */
-
-/* 1) Click chuột trái — chỉ mở modal */
 document.addEventListener('click', e => {
   const trigger = e.target.closest('.btn-view, .item-media');
   if (!trigger) return;
@@ -332,7 +353,6 @@ document.addEventListener('click', e => {
   openModal(trigger.dataset.url, trigger.dataset.filename);
 }, true);
 
-/* 2) Chuột giữa / Ctrl+click / Shift+click — chặn mở tab mới */
 document.addEventListener('auxclick', e => {
   const trigger = e.target.closest('.btn-view, .item-media');
   if (!trigger) return;
@@ -341,7 +361,6 @@ document.addEventListener('auxclick', e => {
   if (e.stopImmediatePropagation) e.stopImmediatePropagation();
 }, true);
 
-/* 3) Kéo ảnh → chặn */
 document.addEventListener('dragstart', e => {
   if (e.target && e.target.tagName === 'IMG') {
     e.preventDefault();
@@ -349,7 +368,6 @@ document.addEventListener('dragstart', e => {
   }
 }, true);
 
-/* 4) Chuột phải trên ảnh / nút → chặn menu ngữ cảnh (không cho "Open image in new tab") */
 document.addEventListener('contextmenu', e => {
   const trigger = e.target.closest('.item-media, .btn-view, .modal-media img');
   if (!trigger) return;
@@ -357,7 +375,6 @@ document.addEventListener('contextmenu', e => {
   e.stopPropagation();
 }, true);
 
-/* 5) Ảnh trong modal — chặn mọi tương tác (không thể điều hướng) */
 if (modalImg) {
   ['click', 'auxclick', 'dragstart', 'contextmenu'].forEach(evt => {
     modalImg.addEventListener(evt, e => {
@@ -367,7 +384,6 @@ if (modalImg) {
   });
 }
 
-/* 6) Nút Tải trong grid */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.btn-dl');
   if (!btn) return;
@@ -377,31 +393,30 @@ document.addEventListener('click', e => {
   downloadFile(btn.dataset.url, btn.dataset.filename, btn);
 }, true);
 
-/* 7) Modal close */
-modalClose.addEventListener('click', closeModal);
+if (modalClose) modalClose.addEventListener('click', closeModal);
 
-/* 8) Modal download */
-modalDl.addEventListener('click', e => {
-  e.preventDefault();
-  e.stopPropagation();
-  if (modalMedia.classList.contains('is-error')) {
-    showToast('Ảnh chưa cập nhật, vui lòng thử lại sau', 'warning');
-    return;
-  }
-  downloadFile(currentUrl, currentFilename, modalDl);
-});
+if (modalDl) {
+  modalDl.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (modalMedia.classList.contains('is-error')) {
+      showToast('Ảnh chưa cập nhật, vui lòng thử lại sau', 'warning');
+      return;
+    }
+    downloadFile(currentUrl, currentFilename, modalDl);
+  });
+}
 
-/* 9) Click ra ngoài modal → đóng */
-modal.addEventListener('click', e => {
-  if (e.target === modal) closeModal();
-});
+if (modal) {
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeModal();
+  });
+}
 
-/* 10) Escape → đóng modal */
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
 });
 
-/* 11) Enter / Space trên item-media → mở modal */
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter' && e.key !== ' ') return;
   const media = e.target.closest('.item-media');
