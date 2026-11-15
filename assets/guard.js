@@ -2,11 +2,14 @@
   'use strict';
   window.__azerstGuardLoaded = true;
   const RELOAD_DELAY = 4;
-  let triggered = false, countdownTimer = null, overlayEl = null, countdownEl = null;
+  let triggered = false;
+  let countdownTimer = null;
+  let overlayEl = null;
+  let countdownEl = null;
 
   function ensureRefs() {
     if (overlayEl) return;
-    overlayEl   = document.getElementById('guardOverlay');
+    overlayEl = document.getElementById('guardOverlay');
     countdownEl = document.getElementById('guardCountdown');
   }
 
@@ -38,21 +41,11 @@
     const k = (e.key || '').toLowerCase();
     const tag = (e.target && e.target.tagName || '').toLowerCase();
     const inField = tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable);
-    if (e.key === 'F12' || e.keyCode === 123) {
-      e.preventDefault(); e.stopPropagation(); triggerGuard(); return false;
-    }
-    if (e.ctrlKey && e.shiftKey && ['i','j','c','k','e','m'].includes(k)) {
-      e.preventDefault(); e.stopPropagation(); triggerGuard(); return false;
-    }
-    if (e.metaKey && e.altKey && ['i','j','c'].includes(k)) {
-      e.preventDefault(); e.stopPropagation(); triggerGuard(); return false;
-    }
-    if ((e.ctrlKey || e.metaKey) && (k === 'u' || k === 's')) {
-      e.preventDefault(); e.stopPropagation(); triggerGuard(); return false;
-    }
-    if ((e.ctrlKey || e.metaKey) && ['c','x','a'].includes(k) && !inField) {
-      e.preventDefault();
-    }
+    if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); e.stopPropagation(); triggerGuard(); return false; }
+    if (e.ctrlKey && e.shiftKey && ['i','j','c','k','e','m'].includes(k)) { e.preventDefault(); e.stopPropagation(); triggerGuard(); return false; }
+    if (e.metaKey && e.altKey && ['i','j','c'].includes(k)) { e.preventDefault(); e.stopPropagation(); triggerGuard(); return false; }
+    if ((e.ctrlKey || e.metaKey) && (k === 'u' || k === 's')) { e.preventDefault(); e.stopPropagation(); triggerGuard(); return false; }
+    if ((e.ctrlKey || e.metaKey) && ['c','x','a'].includes(k) && !inField) { e.preventDefault(); }
   }, true);
 
   document.addEventListener('contextmenu', (e) => e.preventDefault(), { passive: false });
@@ -69,7 +62,7 @@
   if (isDesktop) {
     setInterval(() => {
       if (triggered) return;
-      const wDiff = window.outerWidth  - window.innerWidth;
+      const wDiff = window.outerWidth - window.innerWidth;
       const hDiff = window.outerHeight - window.innerHeight;
       if (wDiff > 260 || hDiff > 260) triggerGuard();
     }, 1000);
