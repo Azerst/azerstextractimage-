@@ -1,8 +1,6 @@
 (function () {
   'use strict';
 
-  console.log('[Admin] Script loaded');
-
   var isInIframe = false;
   try { isInIframe = window.top !== window.self; } catch (e) { isInIframe = true; }
   if (isInIframe) {
@@ -10,8 +8,7 @@
     document.body.innerHTML =
       '<div style="min-height:100vh;display:grid;place-items:center;background:#070a14;color:#ff5a46;font-family:system-ui,sans-serif;text-align:center;padding:24px;">' +
       '<div><h1 style="font-size:56px;font-weight:900;margin-bottom:16px;">&#9940;</h1>' +
-      '<p style="font-size:13px;color:#94a3b8;letter-spacing:1.5px;text-transform:uppercase;">Forbidden</p></div>' +
-      '</div>';
+      '<p style="font-size:13px;color:#94a3b8;letter-spacing:1.5px;text-transform:uppercase;">Forbidden</p></div></div>';
     return;
   }
 
@@ -171,15 +168,11 @@
         updatedAt:  Date.now()
       }));
       return true;
-    } catch (e) {
-      toast('Không lưu được', 'error');
-      return false;
-    }
+    } catch (e) { toast('Không lưu được', 'error'); return false; }
   }
 
   function checkCreds(user, pass) {
-    var a = String(user || '');
-    var b = String(pass || '');
+    var a = String(user || ''), b = String(pass || '');
     if (a.length !== ACC_PLAIN.length || b.length !== PASS_PLAIN.length) return false;
     var diff = 0, i;
     for (i = 0; i < ACC_PLAIN.length; i++)  diff |= a.charCodeAt(i) ^ ACC_PLAIN.charCodeAt(i);
@@ -230,16 +223,10 @@
   function handleLogin(e) {
     e.preventDefault();
     var remaining = getLockRemaining();
-    if (remaining > 0) {
-      showLoginError('Đã khóa. Vui lòng thử lại sau ' + remaining + 's.');
-      return;
-    }
+    if (remaining > 0) { showLoginError('Đã khóa. Vui lòng thử lại sau ' + remaining + 's.'); return; }
     var user = dom.loginUser.value.trim();
     var pass = dom.loginPass.value;
-    if (!user || !pass) {
-      showLoginError('Vui lòng nhập đầy đủ tài khoản và mật khẩu.');
-      return;
-    }
+    if (!user || !pass) { showLoginError('Vui lòng nhập đầy đủ tài khoản và mật khẩu.'); return; }
     if (checkCreds(user, pass)) {
       try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (err) {}
       resetLockData();
@@ -302,17 +289,14 @@
     var files = state.cfg.files[bp] || [];
     var grid = dom.imageGrid;
     dom.imageCount.textContent = files.length + ' ảnh';
-
     if (!files.length) {
       grid.innerHTML = '<div class="empty-state">Chưa có ảnh. Bấm "+ Thêm ảnh" để tạo.</div>';
       return;
     }
-
     grid.innerHTML = files.map(function (file, index) {
       var isNew = !file;
       var effectiveUrl = isNew ? '' : buildEffectiveUrl(bp, file);
       var overrideUrl = isNew ? '' : (state.cfg.overrides[bp + '/' + file] || '');
-
       return (
         '<div class="image-card" data-index="' + index + '">' +
           '<button type="button" class="image-remove" title="Xóa">×</button>' +
@@ -323,14 +307,12 @@
           '<div class="image-info">' +
             (isNew
               ? '<input class="image-filename-input" type="text" placeholder="Tên file..." autofocus>'
-              : '<div class="image-filename" title="' + escapeHtml(file) + '">' + escapeHtml(file) + '</div>'
-            ) +
+              : '<div class="image-filename" title="' + escapeHtml(file) + '">' + escapeHtml(file) + '</div>') +
             '<input class="image-url" type="url" value="' + escapeHtml(overrideUrl) + '" placeholder="' + (isNew ? 'URL tùy chỉnh...' : 'Trống = mặc định') + '" ' + (isNew ? 'disabled' : '') + '>' +
           '</div>' +
         '</div>'
       );
     }).join('');
-
     var newInput = grid.querySelector('.image-filename-input');
     if (newInput) setTimeout(function () { newInput.focus(); }, 30);
   }
@@ -375,11 +357,7 @@
     var bp = state.activeBp;
     if (target.classList.contains('image-filename-input')) {
       var newFile = target.value.trim();
-      if (!newFile) {
-        state.cfg.files[bp].splice(i, 1);
-        renderImageGrid();
-        return;
-      }
+      if (!newFile) { state.cfg.files[bp].splice(i, 1); renderImageGrid(); return; }
       state.cfg.files[bp][i] = newFile;
       renderImageGrid();
     }
@@ -439,21 +417,16 @@
 
   function handleExport() {
     var cfg = {
-      domainFile: state.cfg.domainFile,
-      domainDir:  state.cfg.domainDir,
-      path:       state.cfg.path,
-      files:      state.cfg.files,
-      overrides:  state.cfg.overrides,
-      updatedAt:  Date.now()
+      domainFile: state.cfg.domainFile, domainDir: state.cfg.domainDir,
+      path: state.cfg.path, files: state.cfg.files,
+      overrides: state.cfg.overrides, updatedAt: Date.now()
     };
     var blob = new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
     a.download = 'azerst-config-' + Date.now() + '.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 3000);
     toast('Đã export', 'success');
   }
@@ -482,14 +455,10 @@
           });
         }
         state.cfg = cfg;
-        renderSettings();
-        renderTabs();
-        renderImageGrid();
+        renderSettings(); renderTabs(); renderImageGrid();
         toast('Đã import', 'success');
         setStatus('Đã import lúc ' + new Date().toLocaleTimeString(), 'ok');
-      } catch (err) {
-        toast('File JSON không hợp lệ', 'error');
-      }
+      } catch (err) { toast('File JSON không hợp lệ', 'error'); }
     };
     reader.readAsText(file);
   }
@@ -532,111 +501,57 @@
 
   function cacheDom() {
     dom = {
-      loginScreen: $('loginScreen'),
-      adminScreen: $('adminScreen'),
-      loginForm:   $('loginForm'),
-      loginUser:   $('loginUser'),
-      loginPass:   $('loginPass'),
-      loginBtn:    $('loginBtn'),
-      loginError:  $('loginError'),
-      togglePw:    $('togglePw'),
-      logoutBtn:   $('logoutBtn'),
-      cfgDomainFile: $('cfgDomainFile'),
-      cfgDomainDir:  $('cfgDomainDir'),
-      cfgPath:       $('cfgPath'),
-      tabs:          Array.prototype.slice.call(document.querySelectorAll('.tab[data-bp]')),
-      imageGrid:     $('imageGrid'),
-      imageCount:    $('imageCount'),
-      addImageBtn:   $('addImageBtn'),
-      saveBtn:       $('saveBtn'),
-      resetBtn:      $('resetBtn'),
-      exportBtn:     $('exportBtn'),
-      importInput:   $('importInput'),
-      status:        $('status'),
-      toast:         $('toast')
+      loginScreen: $('loginScreen'), adminScreen: $('adminScreen'),
+      loginForm: $('loginForm'), loginUser: $('loginUser'),
+      loginPass: $('loginPass'), loginBtn: $('loginBtn'),
+      loginError: $('loginError'), togglePw: $('togglePw'),
+      logoutBtn: $('logoutBtn'),
+      cfgDomainFile: $('cfgDomainFile'), cfgDomainDir: $('cfgDomainDir'),
+      cfgPath: $('cfgPath'),
+      tabs: Array.prototype.slice.call(document.querySelectorAll('.tab[data-bp]')),
+      imageGrid: $('imageGrid'), imageCount: $('imageCount'),
+      addImageBtn: $('addImageBtn'),
+      saveBtn: $('saveBtn'), resetBtn: $('resetBtn'), exportBtn: $('exportBtn'),
+      importInput: $('importInput'),
+      status: $('status'), toast: $('toast')
     };
   }
 
   function bindEvents() {
     dom.loginForm.addEventListener('submit', handleLogin);
     dom.loginForm.addEventListener('input', clearLoginError);
-
     dom.togglePw.addEventListener('click', function () {
       var isPw = dom.loginPass.type === 'password';
       dom.loginPass.type = isPw ? 'text' : 'password';
-      dom.togglePw.setAttribute('aria-label', isPw ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
     });
-
     dom.logoutBtn.addEventListener('click', logout);
-
     dom.tabs.forEach(function (tab) {
       tab.addEventListener('click', function () {
         state.activeBp = tab.dataset.bp;
-        renderTabs();
-        renderImageGrid();
+        renderTabs(); renderImageGrid();
       });
     });
-
     dom.addImageBtn.addEventListener('click', handleAddImage);
-
     dom.imageGrid.addEventListener('input',  onGridInput);
     dom.imageGrid.addEventListener('change', onGridChange);
     dom.imageGrid.addEventListener('click',  onGridClick);
     dom.imageGrid.addEventListener('error',  onGridError, true);
-
-    var settingsDebounced = debounce(onSettingsChange, 300);
-    dom.cfgDomainFile.addEventListener('input', settingsDebounced);
-    dom.cfgDomainDir.addEventListener('input',  settingsDebounced);
-    dom.cfgPath.addEventListener('input',       settingsDebounced);
-
+    var s = debounce(onSettingsChange, 300);
+    dom.cfgDomainFile.addEventListener('input', s);
+    dom.cfgDomainDir.addEventListener('input',  s);
+    dom.cfgPath.addEventListener('input',       s);
     dom.saveBtn.addEventListener('click', handleSave);
     dom.resetBtn.addEventListener('click', handleReset);
     dom.exportBtn.addEventListener('click', handleExport);
-
     dom.importInput.addEventListener('change', function (e) {
       handleImport(e.target.files && e.target.files[0]);
       e.target.value = '';
     });
-
     document.addEventListener('keydown', function (e) {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'
-          && !dom.adminScreen.hidden) {
-        e.preventDefault();
-        handleSave();
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && !dom.adminScreen.hidden) {
+        e.preventDefault(); handleSave();
       }
     });
-
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) return;
-      var isLoggedIn = sessionStorage.getItem(SESSION_KEY) === '1';
-      if (!isLoggedIn && !dom.adminScreen.hidden) showLogin();
-    });
-
-    ['drop','dragover','dragenter'].forEach(function (evt) {
-      document.addEventListener(evt, function (e) {
-        if (e.target !== dom.importInput) e.preventDefault();
-      }, true);
-    });
-  }
-
-  function init() {
-    try {
-      cacheDom();
-      bindEvents();
-      if (sessionStorage.getItem(SESSION_KEY) === '1') showAdmin();
-      else showLogin();
-      console.log('[Admin] Init complete');
-    } catch (err) {
-      console.error('[Admin] Init failed:', err);
-      document.body.innerHTML =
-        '<div style="padding:40px;color:#ff5a46;font-family:monospace;background:#070a14;min-height:100vh;">' +
-        '<h1>Admin Init Error</h1><pre>' + (err && err.stack ? err.stack : err) + '</pre></div>';
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
+      var isLoggedIn = sessionStorage
