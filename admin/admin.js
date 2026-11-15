@@ -554,4 +554,25 @@
     });
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) return;
-      var isLoggedIn = sessionStorage
+      var isLoggedIn = sessionStorage.getItem(SESSION_KEY) === '1';
+      if (!isLoggedIn && !dom.adminScreen.hidden) showLogin();
+    });
+  }
+
+  function init() {
+    try {
+      cacheDom();
+      bindEvents();
+      if (sessionStorage.getItem(SESSION_KEY) === '1') showAdmin();
+      else showLogin();
+    } catch (err) {
+      console.error('[Admin] Init failed:', err);
+      document.body.innerHTML =
+        '<div style="padding:40px;color:#ff5a46;font-family:monospace;background:#070a14;min-height:100vh;">' +
+        '<h1>Admin Init Error</h1><pre>' + (err && err.stack ? err.stack : err) + '</pre></div>';
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
