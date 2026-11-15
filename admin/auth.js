@@ -1,14 +1,9 @@
 (function () {
   'use strict';
 
-  /* ============ THÔNG TIN ĐĂNG NHẬP ============ */
-  var ADMIN_USER = 'BCXYZVANBAC???@@!!~~1267034589';
-  var ADMIN_PASS = 'IFy41Q8WA1u4PiwILHlxtoFJzQQGDSOEmPONIVVHEeqRlZPHs1';
-
-  /* ============ SESSION & DATA ============ */
   var SESSION_KEY = 'azer_admin_session';
   var TS_KEY = 'azer_admin_ts';
-  var SESSION_DURATION = 2 * 60 * 60 * 1000; // 2 giờ
+  var SESSION_DURATION = 2 * 60 * 60 * 1000;
 
   var STORAGE_KEY = 'azer_bp_links';
 
@@ -52,8 +47,8 @@
     return true;
   }
 
-  function setSession() {
-    localStorage.setItem(SESSION_KEY, '1');
+  function setSession(token) {
+    localStorage.setItem(SESSION_KEY, token);
     localStorage.setItem(TS_KEY, Date.now().toString());
   }
 
@@ -85,7 +80,7 @@
     }
   }
 
-  /* ============ ĐĂNG NHẬP ============ */
+  // --- ĐĂNG NHẬP (GỌI API SERVER) ---
   function initLogin() {
     if (isLoggedIn()) {
       window.location.replace('./dashboard.html');
@@ -100,34 +95,50 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      var user = (inputUser.value || '').trim();
-      var pass = (inputPass.value || '').trim();
+      var u = (inputUser.value || '').trim();
+      var p = (inputPass.value || '').trim();
 
-      if (!user || !pass) {
+      if (!u || !p) {
         errorEl.textContent = 'Vui lòng nhập đầy đủ tài khoản và mật khẩu';
         errorEl.classList.add('is-show');
         return;
       }
 
-      if (user === ADMIN_USER && pass === ADMIN_PASS) {
-        errorEl.classList.remove('is-show');
-        btn.disabled = true;
-        btn.textContent = 'ĐANG ĐĂNG NHẬP...';
-        setSession();
-        setTimeout(function () {
-          window.location.replace('./dashboard.html');
-        }, 400);
-      } else {
+      btn.disabled = true;
+      btn.textContent = 'ĐANG XÁC THỰC...';
+
+      // Gọi API bảo mật bên ngoài (không check pass ở client nữa)
+      fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: u, password: p })
+      })
+      .then(function(response) { return response.json(); })
+      .then(function(data) {
+        if (data.success && data.token) {
+          errorEl.classList.remove('is-show');
+          btn.textContent = 'THÀNH CÔNG...';
+          setSession(data.token);
+          setTimeout(function () {
+            window.location.replace('./dashboard.html');
+          }, 400);
+        } else {
+          throw new Error('Sai thông tin');
+        }
+      })
+      .catch(function(err) {
         errorEl.textContent = 'Đăng nhập thất bại — sai tài khoản hoặc mật khẩu';
         errorEl.classList.add('is-show');
         inputPass.value = '';
         inputPass.focus();
+        btn.disabled = false;
+        btn.textContent = 'ĐĂNG NHẬP';
         setTimeout(function () { errorEl.classList.remove('is-show'); }, 3500);
-      }
+      });
     });
   }
 
-  /* ============ DASHBOARD ============ */
+  // --- DASHBOARD (Giữ nguyên) ---
   var currentData = null;
   var currentMonth = 'BP104';
 
