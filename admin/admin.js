@@ -1,10 +1,19 @@
-/* =========================================================
-   AZERST ADMIN — Control Panel
-========================================================= */
 (function () {
   'use strict';
 
-  /* ============ CREDENTIALS (XOR key = 137) ============ */
+  if (window.top !== window.self) {
+    try {
+      window.top.location = window.self.location.href;
+    } catch (e) {
+      document.documentElement.innerHTML =
+        '<body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#070a14;color:#ff5a46;font-family:system-ui,sans-serif;text-align:center;padding:24px;">' +
+        '<div><h1 style="font-size:56px;font-weight:900;margin-bottom:16px;">&#9940;</h1>' +
+        '<p style="font-size:13px;color:#94a3b8;letter-spacing:1.5px;text-transform:uppercase;">Forbidden</p></div>' +
+        '</body>';
+    }
+    return;
+  }
+
   const KEY = 137;
   const ACC_ENC = [
     203,202,209,208,211,223,200,199,203,200,202,
@@ -22,11 +31,94 @@
   const ACC_PLAIN  = String.fromCharCode.apply(null, ACC_ENC.map(function (c)  { return c ^ KEY; }));
   const PASS_PLAIN = String.fromCharCode.apply(null, PASS_ENC.map(function (c) { return c ^ KEY; }));
 
-  /* ============ STORAGE KEYS ============ */
   const CFG_KEY     = 'azerst_config';
   const SESSION_KEY = 'azerst_admin_session';
+  const LOCK_KEY    = 'azerst_admin_lock';
 
-  /* ============ DEFAULTS ============ */
+  const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
+  var lastActivityAt = Date.now();
+  var idleTimer = null;
+
+  function touchActivity() { lastActivityAt = Date.now(); }
+
+  function startIdleMonitor() {
+    stopIdleMonitor();
+    lastActivityAt = Date.now();
+    idleTimer = setInterval(function () {
+      if (!dom.adminScreen || dom.adminScreen.hidden) return;
+      if (Date.now() - lastActivityAt > SESSION_TIMEOUT_MS) {
+        logout();
+        toast('Phiên hết hạn do không hoạt động', 'warning');
+      }
+    }, 30000);
+  }
+
+  function stopIdleMonitor() {
+    if (idleTimer) { clearInterval(idleTimer); idleTimer = null; }
+  }
+
+  ['mousemove','keydown','click','touchstart','scroll'].forEach(function (evt) {
+    document.addEventListener(evt, touchActivity, { passive: true });
+  });
+
+  function getLockData() {
+    try {
+      var raw = localStorage.getItem(LOCK_KEY);
+      if (!raw) return { attempts: 0, until: 0 };
+      var d = JSON.parse(raw);
+      return { attempts: Number(d.attempts) || 0, until: Number(d.until) || 0 };
+    } catch (e) {
+      return { attempts: 0, until: 0 };
+    }
+  }
+
+  function saveLockData(d) {
+    try { localStorage.setItem(LOCK_KEY, JSON.stringify(d)); } catch (e) {}
+  }
+
+  function resetLockData() {
+    try { localStorage.removeItem(LOCK_KEY); } catch (e) {}
+  }
+
+  function getLockRemaining() {
+    var d = getLockData();
+    if (!d.until) return 0;
+    var remaining = Math.ceil((d.until - Date.now()) / 1000);
+    if (remaining <= 0) {
+      saveLockData({ attempts: 0, until: 0 });
+      return 0;
+    }
+    return remaining;
+  }
+
+  function recordFailedAttempt() {
+    var d = getLockData();
+    var attempts = d.attempts + 1;
+    if (attempts >= 5) {
+      saveLockData({ attempts: 0, until: Date.now() + 60000 });
+      return { locked: true, remaining: 60 };
+    }
+    saveLockData({ attempts: attempts, until: 0 });
+    return { locked: false, attempts: attempts, remaining: 0 };
+  }
+
+  try {
+    console.log(
+      '%cADMIN PANEL',
+      'color:#ff5a46;font-size:28px;font-weight:900;'
+    );
+    console.log(
+      '%cDo not paste any code here.',
+      'color:#fff;font-size:13px;background:#b52a1c;padding:10px 18px;border-radius:8px;font-weight:600;'
+    );
+  } catch (e) {}
+
+  ['drop', 'dragover', 'dragenter'].forEach(function (evt) {
+    document.addEventListener(evt, function (e) {
+      e.preventDefault();
+    }, true);
+  });
+
   const DEFAULT_FILES = {
     BP104: [
       'BP_Prize_104.png','BP_Task_FP_104.png','BP_104.png','BP_Window_PP_104.png',
@@ -55,19 +147,14 @@
   };
   const BP_KEYS = ['BP104', 'BP105', 'BP106'];
 
-  /* ============ STATE ============ */
   var state = {
     fileEdits: {},
-    activeBp: 'BP104',
-    attempts: 0,
-    lockedUntil: 0
+    activeBp: 'BP104'
   };
 
-  /* ============ DOM ============ */
   var dom = {};
   function $(id) { return document.getElementById(id); }
 
-  /* ============ TOAST / STATUS ============ */
   var toastTimer = null;
   function toast(msg, type) {
     var el = dom.toast;
@@ -94,7 +181,6 @@
     };
   }
 
-  /* ============ AUTH ============ */
   function checkCreds(user, pass) {
     var a = String(user || '');
     var b = String(pass || '');
@@ -103,10 +189,6 @@
     for (i = 0; i < ACC_PLAIN.length; i++)  diff |= a.charCodeAt(i) ^ ACC_PLAIN.charCodeAt(i);
     for (i = 0; i < PASS_PLAIN.length; i++) diff |= b.charCodeAt(i) ^ PASS_PLAIN.charCodeAt(i);
     return diff === 0;
-  }
-
-  function lockRemaining() {
-    return Math.max(0, Math.ceil((state.lockedUntil - Date.now()) / 1000));
   }
 
   function showLoginError(msg) {
@@ -124,44 +206,46 @@
 
   function handleLogin(e) {
     e.preventDefault();
-    var locked = lockRemaining();
-    if (locked > 0) {
-      showLoginError('Đã khóa. Vui lòng thử lại sau ' + locked + 's.');
+
+    var remaining = getLockRemaining();
+    if (remaining > 0) {
+      showLoginError('Đã khóa. Vui lòng thử lại sau ' + remaining + 's.');
       return;
     }
+
     var user = dom.loginUser.value.trim();
     var pass = dom.loginPass.value;
     if (!user || !pass) {
       showLoginError('Vui lòng nhập đầy đủ tài khoản và mật khẩu.');
       return;
     }
+
     if (checkCreds(user, pass)) {
       try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (err) {}
-      state.attempts = 0;
+      resetLockData();
       showAdmin();
       toast('Đăng nhập thành công', 'success');
     } else {
-      state.attempts++;
-      if (state.attempts >= 5) {
-        state.lockedUntil = Date.now() + 30000;
-        state.attempts = 0;
-        showLoginError('Sai quá 5 lần. Đã khóa 30 giây.');
+      var result = recordFailedAttempt();
+      if (result.locked) {
+        showLoginError('Sai quá 5 lần. Đã khóa 60 giây.');
       } else {
-        showLoginError('Sai tài khoản hoặc mật khẩu (' + state.attempts + '/5).');
+        showLoginError('Sai tài khoản hoặc mật khẩu (' + result.attempts + '/5).');
       }
     }
   }
 
   function logout() {
     try { sessionStorage.removeItem(SESSION_KEY); } catch (err) {}
+    stopIdleMonitor();
     dom.adminScreen.hidden = true;
     dom.loginScreen.hidden = false;
     dom.loginForm.reset();
     clearLoginError();
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
     toast('Đã đăng xuất', 'info');
   }
 
-  /* ============ CONFIG IO ============ */
   function loadConfig() {
     try {
       var raw = localStorage.getItem(CFG_KEY);
@@ -174,12 +258,11 @@
       localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
       return true;
     } catch (e) {
-      toast('Không lưu được cấu hình (localStorage đầy?)', 'error');
+      toast('Không lưu được cấu hình', 'error');
       return false;
     }
   }
 
-  /* ============ FORM <-> STATE ============ */
   function fillFormFromConfig() {
     var cfg = loadConfig() || {};
     dom.cfgDomainFile.value = cfg.domainFile || 'https://dl-tata.freefireind.in';
@@ -233,7 +316,6 @@
     renderFileEditor();
   }
 
-  /* ============ SAVE / RESET ============ */
   function collectConfigFromForm() {
     syncEditorToState();
     var overrides = {};
@@ -260,19 +342,18 @@
     var cfg = collectConfigFromForm();
     if (saveConfig(cfg)) {
       toast('Đã lưu cấu hình', 'success');
-      setStatus('✔ Đã lưu lúc ' + new Date().toLocaleTimeString(), 'ok');
+      setStatus('Đã lưu lúc ' + new Date().toLocaleTimeString(), 'ok');
     }
   }
 
   function handleReset() {
-    if (!confirm('Reset toàn bộ cấu hình về mặc định? Thao tác này không thể hoàn tác.')) return;
+    if (!confirm('Reset toàn bộ cấu hình về mặc định?')) return;
     try { localStorage.removeItem(CFG_KEY); } catch (e) {}
     fillFormFromConfig();
     toast('Đã reset về mặc định', 'warning');
     setStatus('Đã reset về mặc định');
   }
 
-  /* ============ IMPORT / EXPORT ============ */
   function handleExport() {
     var cfg = collectConfigFromForm();
     var blob = new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' });
@@ -297,7 +378,7 @@
         if (!saveConfig(cfg)) return;
         fillFormFromConfig();
         toast('Đã import cấu hình', 'success');
-        setStatus('✔ Đã import cấu hình', 'ok');
+        setStatus('Đã import cấu hình', 'ok');
       } catch (err) {
         toast('File JSON không hợp lệ', 'error');
       }
@@ -305,20 +386,24 @@
     reader.readAsText(file);
   }
 
-  /* ============ SCREENS ============ */
   function showAdmin() {
     dom.loginScreen.hidden = true;
     dom.adminScreen.hidden = false;
     fillFormFromConfig();
+    startIdleMonitor();
   }
 
   function showLogin() {
     dom.adminScreen.hidden = true;
     dom.loginScreen.hidden = false;
+    stopIdleMonitor();
+    var remaining = getLockRemaining();
+    if (remaining > 0) {
+      showLoginError('Đã khóa. Vui lòng thử lại sau ' + remaining + 's.');
+    }
     dom.loginUser.focus();
   }
 
-  /* ============ INIT ============ */
   function cacheDom() {
     dom = {
       loginScreen: $('loginScreen'),
@@ -384,6 +469,12 @@
         e.preventDefault();
         handleSave();
       }
+    });
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) return;
+      var isLoggedIn = sessionStorage.getItem(SESSION_KEY) === '1';
+      if (!isLoggedIn && !dom.adminScreen.hidden) showLogin();
     });
   }
 
