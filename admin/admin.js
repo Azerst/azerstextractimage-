@@ -1,16 +1,24 @@
 (function () {
   'use strict';
 
-  if (window.top !== window.self) {
+  console.log('[Admin] Script loaded');
+
+  var isInIframe = false;
+  try {
+    isInIframe = window.top !== window.self;
+  } catch (e) {
+    isInIframe = true;
+  }
+
+  if (isInIframe) {
     try {
       window.top.location = window.self.location.href;
-    } catch (e) {
-      document.documentElement.innerHTML =
-        '<body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#070a14;color:#ff5a46;font-family:system-ui,sans-serif;text-align:center;padding:24px;">' +
-        '<div><h1 style="font-size:56px;font-weight:900;margin-bottom:16px;">&#9940;</h1>' +
-        '<p style="font-size:13px;color:#94a3b8;letter-spacing:1.5px;text-transform:uppercase;">Forbidden</p></div>' +
-        '</body>';
-    }
+    } catch (e) {}
+    document.body.innerHTML =
+      '<div style="min-height:100vh;display:grid;place-items:center;background:#070a14;color:#ff5a46;font-family:system-ui,sans-serif;text-align:center;padding:24px;">' +
+      '<div><h1 style="font-size:56px;font-weight:900;margin-bottom:16px;">&#9940;</h1>' +
+      '<p style="font-size:13px;color:#94a3b8;letter-spacing:1.5px;text-transform:uppercase;">Forbidden</p></div>' +
+      '</div>';
     return;
   }
 
@@ -101,17 +109,6 @@
     saveLockData({ attempts: attempts, until: 0 });
     return { locked: false, attempts: attempts, remaining: 0 };
   }
-
-  try {
-    console.log(
-      '%cADMIN PANEL',
-      'color:#ff5a46;font-size:28px;font-weight:900;'
-    );
-    console.log(
-      '%cDo not paste any code here.',
-      'color:#fff;font-size:13px;background:#b52a1c;padding:10px 18px;border-radius:8px;font-weight:600;'
-    );
-  } catch (e) {}
 
   ['drop', 'dragover', 'dragenter'].forEach(function (evt) {
     document.addEventListener(evt, function (e) {
@@ -225,8 +222,10 @@
       resetLockData();
       showAdmin();
       toast('Đăng nhập thành công', 'success');
+      console.log('[Admin] Login OK');
     } else {
       var result = recordFailedAttempt();
+      console.log('[Admin] Login failed, attempt:', result.attempts, 'locked:', result.locked);
       if (result.locked) {
         showLoginError('Sai quá 5 lần. Đã khóa 60 giây.');
       } else {
@@ -479,12 +478,23 @@
   }
 
   function init() {
-    cacheDom();
-    bindEvents();
-    if (sessionStorage.getItem(SESSION_KEY) === '1') {
-      showAdmin();
-    } else {
-      showLogin();
+    try {
+      cacheDom();
+      bindEvents();
+
+      if (sessionStorage.getItem(SESSION_KEY) === '1') {
+        showAdmin();
+      } else {
+        showLogin();
+      }
+      console.log('[Admin] Init complete');
+    } catch (err) {
+      console.error('[Admin] Init failed:', err);
+      document.body.innerHTML =
+        '<div style="padding:40px;color:#ff5a46;font-family:monospace;background:#070a14;min-height:100vh;">' +
+        '<h1>Admin Init Error</h1>' +
+        '<pre>' + (err && err.stack ? err.stack : err) + '</pre>' +
+        '</div>';
     }
   }
 
